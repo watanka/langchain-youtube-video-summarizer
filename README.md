@@ -3,11 +3,23 @@
 ## Motivation
 - [유튜브 보는 것도 지겹다! - 유튜브 영상 요약 인공지능 만들어볼까요?](https://www.youtube.com/watch?v=g77Ob5_hPKE) 본 후, 이를 API로 서빙해봐야겠다라는 생각이 들었음.
 
+  
+
+## Getting Started
+1. .env.sample을 참고하여 .env 파일을 작성해줍니다. 바로 돌려보고싶다면, OPENAI_API_KEY만 작성해주세요.
+2. ``` docker-compose up ```
+
+
+
 ### Outline
 ![outline](imgs/outline.png)
 
+
+
 ### 기술 스택
 docker-compose, docker, FastAPI, MySQL, Gradio
+
+
 
 ### API endpoint
 - summarize : `POST`, youtube_url
