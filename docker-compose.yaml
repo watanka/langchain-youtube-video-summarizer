@@ -1,0 +1,92 @@
+version: "3"
+
+services :
+  proxy : 
+    image : "proxy"
+    build : 
+      dockerfile : "./Dockerfile.proxy"
+
+    restart : unless-stopped    
+    ports :
+      - "8080:${PROXY_PORT}"
+    depends_on :
+      - transcriber
+      - summarizer
+
+    volumes : 
+      - type : bind
+        source : ./proxy
+        target : /proxy
+      - type : bind 
+        source : ./run.sh
+        target : /proxy/run.sh
+      - audios:/proxy/${AUDIO_PATH}
+
+    
+    environment :
+      - APP_NAME=${APP_NAME}
+      - PORT=${PROXY_PORT}
+      - TRANSCRIBER_SERVICE=${TRANSCRIBER_SERVICE}
+      - SUMMARIZER_SERVICE=${SUMMARIZER_SERVICE}
+
+    networks : 
+      - my_network
+    command : ["sh", "./run.sh"]
+
+  transcriber :
+    image : "transcriber"
+    build : 
+      dockerfile : "./Dockerfile.transcriber"
+
+    environment :
+      - APP_NAME=${APP_NAME}
+      - PORT=${TRANSCRIBER_PORT}
+    
+    ports :
+      - "5000:5000"
+    volumes : 
+      - type : bind
+        source : ./transcriber
+        target : /transcriber
+      - type : bind 
+        source : ./run.sh
+        target : /transcriber/run.sh
+      - transcription:/transcriber/${TRANSCRIPTION_PATH}
+      - audios:/transcriber/${AUDIO_PATH}
+
+
+    restart : unless-stopped
+    networks : 
+      - my_network
+    command : ["sh", "./run.sh"]
+  
+  summarizer : 
+    image : "summarizer"
+    build : 
+      dockerfile : "./Dockerfile.summarizer"
+
+    environment :
+      - APP_NAME=${APP_NAME}
+      - PORT=${SUMMARIZER_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+    volumes : 
+      - type : bind
+        source : ./summarizer
+        target : /summarizer
+      - type : bind 
+        source : ./run.sh
+        target : /summarizer/run.sh
+      - transcription:/summarizer/${TRANSCRIPTION_PATH}
+
+    restart : unless-stopped
+    networks : 
+      - my_network
+    command : ["sh", "./run.sh"]
+  
+networks :
+  my_network : 
+
+volumes :
+  audios : 
+  transcription :

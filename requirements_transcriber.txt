@@ -1,0 +1,7 @@
+fastapi
+gunicorn
+uvicorn[standard]
+whisper
+starlette
+torch
+python-dotenv
