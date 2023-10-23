@@ -5,3 +5,4 @@ whisper
 starlette
 torch
 python-dotenv
+pytube
