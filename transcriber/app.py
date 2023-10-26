@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from transcriber import YoutubeTranscriber
 
 from typing import Dict
 from dotenv import load_dotenv
@@ -18,23 +19,18 @@ print('whisper model ready')
 
 app = FastAPI()
 
+yt_transcriber = YoutubeTranscriber(transcribe_model = model)
+
 @app.get('/health')
 def health() -> Dict[str, str]:
     return {"health": "ok"}
 
 
 @app.post('/transcribe/')
-def transcribe(audiofile_path : str) -> Dict[str, str] :
-    result = model.transcribe(audiofile_path)
+def transcribe(url : str) -> Dict[str, str] :
 
-    trsript_fname = os.path.basename(os.path.splitext(audiofile_path)[0] + '.txt')
-
-    trscript_dir = os.getenv("TRANSCRIPTION_PATH", "transcriptions")
-
-    trscript_path = os.path.join(trscript_dir, trsript_fname)
-    with open(trscript_path, 'w') as f :
-        f.write(result['text'])
-
+    trscript_path = yt_transcriber(video_url = url)
+    
     return {'transcription_path' : trscript_path}
 
     
