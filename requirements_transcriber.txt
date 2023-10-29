@@ -6,3 +6,4 @@ starlette
 torch
 python-dotenv
 pytube
+redis

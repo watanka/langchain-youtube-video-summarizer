@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from transcription import YoutubeTranscriber
 
+from uuid import uuid4
 from typing import Dict
 from dotenv import load_dotenv
 import whisper
@@ -27,10 +28,13 @@ def health() -> Dict[str, str]:
 
 
 @app.post('/transcribe/')
-def transcribe(url : str) -> Dict[str, str] :
+def transcribe(url : str, background_tasks : BackgroundTasks) -> Dict[str, str] :
 
     trscript_path = yt_transcriber(video_url = url)
     
+    job_id = str(uuid4())[:6]
+
+    return {'job_id' : job_id}
     return {'transcription_path' : trscript_path}
 
     

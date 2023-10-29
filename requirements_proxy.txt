@@ -7,3 +7,4 @@ starlette
 httpx
 asyncio
 pytube
+redis

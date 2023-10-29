@@ -7,9 +7,6 @@ import asyncio
 import os
 import json
 from typing import Dict, Any
-
-
-from tools import convert_video2audio
 from schemas import UserRequest
 from configurations import ServiceConfigurations
 
@@ -54,7 +51,6 @@ def list_summaries() :
 
 @app.post('/summary')
 def request_summary(user_request : UserRequest, background_tasks : BackgroundTasks) :
-<<<<<<< HEAD
     logger.debug('transcriber_service_url', transcriber_service_url)
     transcriber_response = httpx.post(transcriber_service_url +'/transcribe/', 
                                         headers = {'Content-Type' : 'application/json'}, 
@@ -68,19 +64,4 @@ def request_summary(user_request : UserRequest, background_tasks : BackgroundTas
                                     params = {'transcript_path' : str(transcription_path)}, 
                                     timeout = None)
     logger.debug('summarize_response', summarize_response)
-=======
-
-    transcriber_response = httpx.post(transcriber_service_url, 
-                                        headers = {'Content-Type' : 'application/json'}, 
-                                        params = {"input" : user_request.url}, 
-                                        timeout = None)
-    
-    transcription_path = transcriber_response.json()['transcription_path']
-    # # 3. summarize from llm server
-    summarize_response = httpx.post(summarizer_service_url, 
-                                    headers = {'Content-Type' : 'application/json'}, 
-                                    json = {'trscript_path' : transcription_path}, 
-                                    timeout = None)
-
->>>>>>> 9105c69e1726ae34adab85dee3e06fce24abf2dd
     return summarize_response.json()['summary']
