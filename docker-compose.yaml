@@ -20,6 +20,9 @@ services :
       - type : bind 
         source : ./run.sh
         target : /proxy/run.sh
+      - type : bind 
+        source : ./logging.conf
+        target : /proxy/logging.conf
       - audios:/proxy/${AUDIO_PATH}
 
     
@@ -51,6 +54,9 @@ services :
       - type : bind 
         source : ./run.sh
         target : /transcriber/run.sh
+      - type : bind 
+        source : ./logging.conf
+        target : /transcriber/logging.conf
       - transcription:/transcriber/${TRANSCRIPTION_PATH}
       - audios:/transcriber/${AUDIO_PATH}
 
@@ -77,6 +83,9 @@ services :
       - type : bind 
         source : ./run.sh
         target : /summarizer/run.sh
+      - type : bind 
+        source : ./logging.conf
+        target : /summarizer/logging.conf
       - transcription:/summarizer/${TRANSCRIPTION_PATH}
 
     restart : unless-stopped

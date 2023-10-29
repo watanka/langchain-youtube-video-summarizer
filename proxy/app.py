@@ -10,7 +10,7 @@ from typing import Dict, Any
 
 
 from tools import convert_video2audio
-from schemas import SummaryRequest
+from schemas import UserRequest
 from configurations import ServiceConfigurations
 
 #logging
@@ -53,19 +53,18 @@ def list_summaries() :
     pass
 
 @app.post('/summary')
-def request_summary(summary_request : SummaryRequest, background_tasks : BackgroundTasks) :
-
-    # 1. convert from video url to mp3
-    audio_output_path = convert_video2audio(video_url = summary_request.url) # docker volume에 저장
-    
-    # 2. request to transriber server
-    transcriber_service_url = 'http://transcriber:5000' + '/transcribe/'
-    print('transriber url :', transcriber_service_url)
-    logger.debug(audio_output_path)
-    transcriber_response = httpx.post(transcriber_service_url, headers = {'Content-Type' : 'application/json'}, params = {"audiofile_path" : audio_output_path}, timeout = None)
-    
+def request_summary(user_request : UserRequest, background_tasks : BackgroundTasks) :
+    logger.debug('transcriber_service_url', transcriber_service_url)
+    transcriber_response = httpx.post(transcriber_service_url +'/transcribe/', 
+                                        headers = {'Content-Type' : 'application/json'}, 
+                                        params = {"url" : user_request.url}, 
+                                        timeout = None)
     transcription_path = transcriber_response.json()['transcription_path']
     # # 3. summarize from llm server
-    summarize_response = httpx.post(summarizer_service_url, headers = {'Content-Type' : 'application/json'}, json = {'trscript_path' : transcription_path}, timeout = None)
-
+    logger.debug('transcription_path', transcription_path)
+    summarize_response = httpx.post(summarizer_service_url + '/summarize/', 
+                                    headers = {'Content-Type' : 'application/json'}, 
+                                    params = {'transcript_path' : str(transcription_path)}, 
+                                    timeout = None)
+    logger.debug('summarize_response', summarize_response)
     return summarize_response.json()['summary']

@@ -7,10 +7,13 @@ HOST=${HOST:-"0.0.0.0"}
 PORT=${PORT:-8080}
 WORKERS=${WORKERS:-1}
 UVICORN_WORKER=${UVICORN_WORKER:-"uvicorn.workers.UvicornWorker"}
+LOGLEVEL=${LOGLEVEL:-"debug"}
+LOGCONFIG=${LOGCONFIG:-"./logging.conf"}
 
 gunicorn ${APP_NAME} \
     -b ${HOST}:${PORT} \
     -w ${WORKERS} \
     -k ${UVICORN_WORKER} \
-    --capture-output \
+    --log-level ${LOGLEVEL} \
+    --log-config ${LOGCONFIG} \
     --reload
