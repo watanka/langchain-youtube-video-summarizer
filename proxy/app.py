@@ -1,6 +1,13 @@
 from fastapi import FastAPI, BackgroundTasks
 import httpx
 
+from uuid import uuid4
+
+import sys, os
+
+sys.path.append(os.path.abspath('/backend'))
+import background_job, store_data_job
+
 import logging
 import asyncio
 
@@ -51,17 +58,36 @@ def list_summaries() :
 
 @app.post('/summary')
 def request_summary(user_request : UserRequest, background_tasks : BackgroundTasks) :
-    logger.debug('transcriber_service_url', transcriber_service_url)
-    transcriber_response = httpx.post(transcriber_service_url +'/transcribe/', 
-                                        headers = {'Content-Type' : 'application/json'}, 
-                                        params = {"url" : user_request.url}, 
-                                        timeout = None)
-    transcription_path = transcriber_response.json()['transcription_path']
-    # # 3. summarize from llm server
-    logger.debug('transcription_path', transcription_path)
-    summarize_response = httpx.post(summarizer_service_url + '/summarize/', 
-                                    headers = {'Content-Type' : 'application/json'}, 
-                                    params = {'transcript_path' : str(transcription_path)}, 
-                                    timeout = None)
-    logger.debug('summarize_response', summarize_response)
-    return summarize_response.json()['summary']
+    job_id = str(uuid4())[:6]
+
+    background_job.save_data_job(src_url=user_request.url,
+                                 job_id = job_id,
+                                 background_tasks = background_tasks,
+                                 enqueue = True
+                                 )
+
+    return job_id
+
+
+    # transcriber_response = httpx.post(transcriber_service_url +'/transcribe/', 
+    #                                     headers = {'Content-Type' : 'application/json'}, 
+    #                                     params = {"url" : user_request.url}, 
+    #                                     timeout = None)
+    # transcription_path = transcriber_response.json()['transcription_path']
+    # # # 3. summarize from llm server
+    
+    # summarize_response = httpx.post(summarizer_service_url + '/summarize/', 
+    #                                 headers = {'Content-Type' : 'application/json'}, 
+    #                                 params = {'transcript_path' : str(transcription_path)}, 
+    #                                 timeout = None)
+    
+    # return summarize_response.json()['summary']
+
+
+@app.get('/job/{job_id}')
+def summary_result(job_id: str):
+    result = {job_id : {'prediction' : ''}}
+    summary = store_data_job.get_data_redis(key = job_id)
+    result[job_id]['prediction'] = summary
+
+    return result

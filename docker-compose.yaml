@@ -93,6 +93,23 @@ services :
       - my_network
     command : ["sh", "./run.sh"]
   
+  backend :
+    image : 'backend'
+    build :
+      dockerfile : './Dockerfile.backend'
+    entrypoint: ["python", "-m", "monitor"]
+    depends_on :
+      - redis
+    networks :
+      - my_network
+
+  redis:
+    image : 'redis'
+    expose :
+      - 6379
+    networks :
+      - my_network
+
 networks :
   my_network : 
 
