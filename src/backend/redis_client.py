@@ -1,5 +1,5 @@
 import redis
-from configurations import RedisCacheConfigurations
+from src.backend.configurations import RedisCacheConfigurations
 
 redis_client = redis.Redis(
     host = RedisCacheConfigurations.cache_host,

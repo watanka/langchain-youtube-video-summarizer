@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-ENV WORKDIR backend
+ENV WORKDIR backend-server
 ENV PYTHONDONTWRITEBYTECODE 1
 
 WORKDIR /${WORKDIR}
@@ -14,9 +14,9 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install --no-cache-dir -r requirements_backend.txt
 
-COPY ./backend/ /${WORKDIR}/
+COPY ./src/ /${WORKDIR}/src/
 
 ENV LOG_LEVEL DEBUG
 ENV LOG_FORMAT TEXT
 
-CMD ["python", "-m", "monitor"]
+CMD ["python", "-m", "src.backend.monitor"]

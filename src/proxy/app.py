@@ -5,8 +5,8 @@ from uuid import uuid4
 
 import sys, os
 
-sys.path.append(os.path.abspath('/backend'))
-import background_job, store_data_job
+
+from src.backend import background_job, store_data_job
 
 import logging
 import asyncio
@@ -14,8 +14,8 @@ import asyncio
 import os
 import json
 from typing import Dict, Any
-from schemas import UserRequest
-from configurations import ServiceConfigurations
+from src.proxy.schemas import UserRequest
+from src.proxy.configurations import ServiceConfigurations
 
 #logging
 logging.basicConfig(level=logging.DEBUG)

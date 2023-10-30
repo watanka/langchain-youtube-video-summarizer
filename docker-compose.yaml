@@ -27,7 +27,7 @@ services :
 
     
     environment :
-      - APP_NAME=${APP_NAME}
+      - APP_NAME=src.proxy.app:app #${APP_NAME}
       - PORT=${PROXY_PORT}
       - TRANSCRIBER_SERVICE=${TRANSCRIBER_SERVICE}
       - SUMMARIZER_SERVICE=${SUMMARIZER_SERVICE}
@@ -97,7 +97,7 @@ services :
     image : 'backend'
     build :
       dockerfile : './Dockerfile.backend'
-    entrypoint: ["python", "-m", "monitor"]
+    entrypoint: ["python", "-m", "src.backend.monitor"]
     depends_on :
       - redis
     networks :

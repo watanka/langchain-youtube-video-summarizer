@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-ENV WORKDIR proxy
+ENV WORKDIR proxy-server
 ENV AUDIO_PATH 'audios'
 ENV PYTHONDONTWRITEBYTECODE 1
 
@@ -15,8 +15,7 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install --no-cache-dir -r requirements_proxy.txt
 
-COPY ./proxy/ /${WORKDIR}/
-COPY ./backend/ /backend/
+COPY ./src /${WORKDIR}/src/
 
 COPY ./run.sh /${WORKDIR}/run.sh
 RUN chmod +x /${WORKDIR}/run.sh

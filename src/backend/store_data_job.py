@@ -1,5 +1,5 @@
 from logging import getLogger
-from redis_client import redis_client
+from src.backend.redis_client import redis_client
 from typing import Any
 
 logger = getLogger(__name__)
@@ -26,4 +26,5 @@ def get_data_redis(key: str) -> Any :
     return data
 
 
-
+def list_jobs_in_queue(queue_name : str) : 
+    return redis_client.lrange(queue_name, 0, -1)

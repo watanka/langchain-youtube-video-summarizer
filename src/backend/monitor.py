@@ -5,8 +5,8 @@ import os
 from time import sleep
 
 import httpx
-import store_data_job
-from configurations import ServiceConfigurations, CacheConfigurations
+from src.backend import store_data_job
+from src.backend.configurations import ServiceConfigurations, CacheConfigurations
 
 
 
@@ -19,19 +19,20 @@ logger.setLevel(DEBUG)
 
 
 transcriber_service_url = ServiceConfigurations.services.get('transcriber', 'http://transcriber:5000') + '/transcribe/'
-summarizer_service_url = ServiceConfigurations.services.get('summarizser', 'http://summarizer:6000') + '/summarize/'
+summarizer_service_url = ServiceConfigurations.services.get('summarizer', 'http://summarizer:6000') + '/summarize/'
 logger.debug(f'transcriber service url : {transcriber_service_url}')
 logger.debug(f'summarizer service url : {summarizer_service_url}')
 
 
 def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url : str) :
     job_id = store_data_job.right_pop_queue(CacheConfigurations.queue_name)
-
+    # logger.debug(f'monitoring {CacheConfigurations.queue_name}')
+    logger.debug(store_data_job.list_jobs_in_queue(CacheConfigurations.queue_name))
     if job_id is not None : # found job to proces
         url = store_data_job.get_data_redis(job_id)
         if url != '' :
             return True
-
+        logger.debug(f'job id : {job_id}')
         transcriber_response = httpx.post(transcriber_url,
                    headers = {'Content-Type' : 'application/json'},
                    params = {'url' : url},
