@@ -26,12 +26,12 @@ logger.debug(f'summarizer service url : {summarizer_service_url}')
 
 def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url : str) :
     job_id = store_data_job.right_pop_queue(CacheConfigurations.queue_name)
-    # logger.debug(f'monitoring {CacheConfigurations.queue_name}')
-    logger.debug(store_data_job.list_jobs_in_queue(CacheConfigurations.queue_name))
+    # logger.debug(f'job_id : {job_id}')
+    # logger.debug(f'{CacheConfigurations.queue_name} : {store_data_job.list_jobs_in_queue(CacheConfigurations.queue_name)}')
     if job_id is not None : # found job to proces
         url = store_data_job.get_data_redis(job_id)
-        if url != '' :
-            return True
+        # if url != '' :
+        #     return True
         logger.debug(f'job id : {job_id}')
         transcriber_response = httpx.post(transcriber_url,
                    headers = {'Content-Type' : 'application/json'},
@@ -63,7 +63,6 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
 
 def _loop() :
     # send job request to transcriber & summarizer
-
     while True :
         sleep(1)
         _trigger_prediction_if_queue(transcriber_service_url, summarizer_service_url)

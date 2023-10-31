@@ -4,3 +4,4 @@ uvicorn[standard]
 langchain
 openai
 tiktoken
+llama-cpp-python

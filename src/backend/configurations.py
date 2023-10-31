@@ -25,3 +25,4 @@ class RedisCacheConfigurations(CacheConfigurations) :
     redis_decode_responses = bool(os.getenv('REDIS_DECODE_RESPONSES', True))
 
 logger.info(f'{CacheConfigurations.__name__}: {CacheConfigurations.__dict__}')
+logger.info(f'{RedisCacheConfigurations.__name__}: {RedisCacheConfigurations.__dict__}')

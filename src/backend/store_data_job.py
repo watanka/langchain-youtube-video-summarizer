@@ -1,8 +1,17 @@
 from logging import getLogger
-from src.backend.redis_client import redis_client
+from src.backend.configurations import RedisCacheConfigurations
+import redis
 from typing import Any
 
 logger = getLogger(__name__)
+
+redis_client = redis.Redis(
+    host = RedisCacheConfigurations.cache_host,
+    port = RedisCacheConfigurations.cache_port,
+    db = RedisCacheConfigurations.redis_db,
+    decode_responses = RedisCacheConfigurations.redis_decode_responses
+)
+
 
 def left_push_queue(queue_name: str, key : str) -> bool :
     try : 
@@ -28,3 +37,7 @@ def get_data_redis(key: str) -> Any :
 
 def list_jobs_in_queue(queue_name : str) : 
     return redis_client.lrange(queue_name, 0, -1)
+
+def list_kv() :
+    keys = redis_client.keys('*')
+    return {key : redis_client.get(key) for key in keys}

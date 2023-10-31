@@ -1,6 +1,7 @@
 from typing import List
 from langchain.llms import OpenAI
 
+from langchain.llms import llamacpp
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 
@@ -10,7 +11,8 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 import os
 from dotenv import find_dotenv, load_dotenv
@@ -21,7 +23,22 @@ if not api_key :
     load_dotenv(find_dotenv('.env.summarizer'))
 
 
-llm = ChatOpenAI(temperature = 0, openai_api_key = api_key)
+# llm = ChatOpenAI(temperature = 0, openai_api_key = api_key)
+
+# local llm
+model_path = '/summarizer/local_llm/mistral-7b-openorca.Q4_0.gguf' #all-MiniLM-L6-v2-f16.gguf'
+
+n_gpu_layers = 40
+n_batch = 512
+callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+
+llm = llamacpp.LlamaCpp(
+    model_path = model_path,
+    n_gpu_layers= n_gpu_layers,
+    n_batch = n_batch,
+    callback_manager = callback_manager,
+    verbose = True
+)
 
 # Map prompt
 map_template = """The follwing is a set of documents

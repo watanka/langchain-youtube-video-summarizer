@@ -37,7 +37,7 @@ docker-compose, docker, FastAPI, MySQL, Gradio
     - 동영상 -> 음성 mp3  
     - whisper 서빙 최적화  
     - langchain 서빙 최적화
-        - langchain 모델 체적화
+        - langchain 모델 최적화
             - -> open source LLM으로 교체해서 비용을 줄일 수 있을까?
             - ??
         - langchain 자체에서

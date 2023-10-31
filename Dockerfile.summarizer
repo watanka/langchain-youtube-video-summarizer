@@ -2,6 +2,8 @@ FROM python:3.10-slim
 
 ENV WORKDIR summarizer
 ENV PYTHONDONTWRITEBYTECODE 1
+ENV CMAKE_ARGS "-DLLAMA_CUBLAS=on"
+ENV FORCE_CMAKE 1
 
 COPY /summarizer /${WORKDIR}
 WORKDIR /${WORKDIR}
@@ -11,9 +13,12 @@ COPY ./logging.conf /${WORKDIR}/logging.conf
 
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc && \
+    apt-get install build-essential -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    pip3 install --no-cache-dir -r requirements_summarizer.txt
+    pip3 install --no-cache-dir -r requirements_summarizer.txt 
+    
+    # for local llama-cpp
 
 EXPOSE ${SUMMARIZER_PORT}
 

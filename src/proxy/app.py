@@ -84,10 +84,14 @@ def request_summary(user_request : UserRequest, background_tasks : BackgroundTas
     # return summarize_response.json()['summary']
 
 
-@app.get('/job/{job_id}')
+@app.get('/jobs/{job_id}')
 def summary_result(job_id: str):
     result = {job_id : {'prediction' : ''}}
     summary = store_data_job.get_data_redis(key = job_id)
     result[job_id]['prediction'] = summary
 
     return result
+
+@app.get('/jobs')
+def list_result() :
+    return store_data_job.list_kv()

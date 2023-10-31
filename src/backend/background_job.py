@@ -23,7 +23,7 @@ class SaveDataJob(BaseModel) :
         pushed = store_data_job.left_push_queue(self.queue_name, self.job_id)
         if pushed :
             logger.info(f'pushed {self.job_id} into queue.')
-            logger.info(f'{store_data_job.list_jobs_in_queue(self.queue_name)}')
+            logger.info(f'{self.queue_name} : {store_data_job.list_jobs_in_queue(self.queue_name)}')
         
 
 def save_data_job(
