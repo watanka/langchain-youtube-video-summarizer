@@ -6,44 +6,26 @@
   
 
 ## Getting Started
-1. .env.sample을 참고하여 .env 파일을 작성해줍니다. 바로 돌려보고싶다면, OPENAI_API_KEY만 작성해주세요.
-2. ``` docker-compose up ```
+``` docker-compose up --build ```
+* .env.sample을 참고하여 .env 파일을 작성해줍니다. 바로 돌려보고싶다면, OPENAI_API_KEY만 작성해주세요.  
+
 
 
 
 ### Outline
-![outline](imgs/outline.png)
+![outline](imgs/outline2.png)
 
 
 
 ### 기술 스택
-docker-compose, docker, FastAPI, MySQL, Gradio
+docker-compose, docker, FastAPI, Redis
 
 
 
 ### API endpoint
-- summarize : `POST`, youtube_url
+- /list : `GET`. 
+- summarize : `POST`, youtube url을 인자로 넘기면, job_id 리턴. 레디스큐에 쌓인 job은 순차적으로 작업을 처리함.
+- /jobs/{job_id} : `GET`. 등록된 job을 job_id로 조회 가능. 미완료 시, youtube url을 리턴함. 완료 시, 해당 url의 summary를 리턴함.
+- /jobs : `GET`. 레디스에 등록된 key, value 쌍을 전부 리턴함. 완료/미완료 작업 포함.
 
 
-
-### TODO
-- 인풋 아웃풋 검증 
-- 비교적 간단한 구성이라 바로 올릴 수 있었지만, 만약 에러가 발생하면 어떻게 에러 - 고침 - 검증 - 피드백 과정을 빠르게 진행시킬 수 있을까? => TDD
-- 성능 개선을 위한 방법 - 지금 너무 느림
-    - [ ] 정확도
-    - [ ] 속도
-
-- 성능 개선 포인트
-    - 동영상 -> 음성 mp3  
-    - whisper 서빙 최적화  
-    - langchain 서빙 최적화
-        - langchain 모델 최적화
-            - -> open source LLM으로 교체해서 비용을 줄일 수 있을까?
-            - ??
-        - langchain 자체에서
-            - 텍스트 분할
-            - 프롬프트 최적화
-            - mapreduce 최적화
-
-- 파이프라인 중간에 프로세스가 종료된다면? DB가 필요함
-    - docker volume에 audio 파일 임시 저장
