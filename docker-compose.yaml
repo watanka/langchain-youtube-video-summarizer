@@ -1,6 +1,22 @@
 version: "3"
 
 services :
+  frontend :
+    image : 'frontend'
+    build :
+      dockerfile : './Dockerfile.frontend'
+    restart : unless-stopped
+    ports :
+      - "8500:${FRONTEND_PORT}"
+    depends_on :
+      - proxy
+    networks :
+      - my_network
+    environment :
+      - STREAMLIT_SERVER_PORT=${FRONTEND_PORT}
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    command : ["streamlit", "run", "app.py"]
+    
   proxy : 
     image : "proxy"
     build : 
