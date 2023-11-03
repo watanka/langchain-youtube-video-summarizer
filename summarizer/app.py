@@ -1,8 +1,11 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from langchain.prompts import PromptTemplate
+from langchain.schema import runnable
 from typing import Dict
-from mapreduce_langchain import mapreduce_transcript
 
+from fastapi import FastAPI
+from langserve import add_routes
+import uvicorn
+from summary_chain import map_reduce
 
 app = FastAPI()
 
@@ -12,10 +15,25 @@ def health() -> Dict[str, str]:
     return {"health": "ok"}
 
 
-@app.post('/summarize/')
-def summarize(transcript_path : str) -> Dict[str, str] :
-    with open(transcript_path, 'r') as f :
-        transcription = f.read()
-    
-    sum_result = mapreduce_transcript(transcription)
-    return {'summary' : sum_result}
+add_routes(
+    app,
+    map_reduce,
+    path = '/summarizer',
+    input_type = runnable.RunnableParallel,
+    config_keys = {'concurrency'}
+)
+
+# add_routes(
+#     app,
+#     rag_chain,
+#     path = '/llama-cpp-rag'
+# )
+
+# document_prompt = PromptTemplate.from_template('{page_content}')
+# map_prompt = '''
+# summarize this content: 
+# {context}
+# '''
+
+# if __name__ == '__main__' :
+#     uvicorn.run(app, host = '127.0.0.1', port = 6500)
