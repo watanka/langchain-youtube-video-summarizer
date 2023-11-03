@@ -5,7 +5,7 @@ class InputHandler :
         self.parser = parser
         self.parse_obj = None
         self.video_stream = None
-
+        # 필요한 정보
         self.video_id = None
         self.video_title = None
         self.file_size = None
