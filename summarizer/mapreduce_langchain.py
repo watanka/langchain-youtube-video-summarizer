@@ -1,6 +1,7 @@
 from typing import List
 from langchain.llms import OpenAI
 
+import tiktoken
 from langchain.llms import llamacpp
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
@@ -23,22 +24,22 @@ if not api_key :
     load_dotenv(find_dotenv('.env.summarizer'))
 
 
-# llm = ChatOpenAI(temperature = 0, openai_api_key = api_key)
+llm = ChatOpenAI(temperature = 0, openai_api_key = api_key)
 
 # local llm
-model_path = '/summarizer/local_llm/mistral-7b-openorca.Q4_0.gguf' #all-MiniLM-L6-v2-f16.gguf'
+# model_path = '/summarizer/local_llm/mistral-7b-openorca.Q4_0.gguf' #all-MiniLM-L6-v2-f16.gguf'
 
-n_gpu_layers = 40
-n_batch = 512
-callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+# n_gpu_layers = 40
+# n_batch = 512
+# callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
 
-llm = llamacpp.LlamaCpp(
-    model_path = model_path,
-    n_gpu_layers= n_gpu_layers,
-    n_batch = n_batch,
-    callback_manager = callback_manager,
-    verbose = True
-)
+# llm = llamacpp.LlamaCpp(
+#     model_path = model_path,
+#     n_gpu_layers= n_gpu_layers,
+#     n_batch = n_batch,
+#     callback_manager = callback_manager,
+#     verbose = True
+# )
 
 # Map prompt
 map_template = """The follwing is a set of documents
@@ -70,7 +71,7 @@ reduce_documents_chain = ReduceDocumentsChain(
     # if documents exceed context for 'StuffDocumentsChain'
     collapse_documents_chain = combine_documents_chain,
     # The maximum number of tokens to group documents into.
-    token_max = 4000,
+    token_max = 256,
 )
 
 # 2. Map chain
@@ -88,12 +89,29 @@ map_reduce_chain = MapReduceDocumentsChain(
     return_intermediate_steps = False,
 )
 
+tokenizer = tiktoken.get_encoding('cl100k_base')
+
+def token_size(text) :
+    tokens = tokenizer.encode(text)
+    return len(tokens)
+
+def split_docs(context : str) -> List[Document] :
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size = 128,
+        chunk_overlap = 25, 
+        length_function = token_size
+    )
+
+    docs = [Document(page_content = x) for x in text_splitter.split_text(context)]
+
+    return docs
+
 ## text split
 def split_text(context : str) -> List[Document] :
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 1000,
-        chunk_overlap = 50, 
-        length_function = len
+        chunk_size = 128,
+        chunk_overlap = 25, 
+        length_function = token_size
     )
 
     docs = [Document(page_content = x) for x in text_splitter.split_text(context)]
