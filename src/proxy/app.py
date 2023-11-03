@@ -49,13 +49,6 @@ async def health_all() -> Dict[str, Any] :
     return results
 
 
-@app.get('/list')
-def list_summaries() :
-    '''
-    read all summaries in db.
-    '''
-    pass
-
 @app.post('/summary')
 def request_summary(user_request : UserRequest, background_tasks : BackgroundTasks) :
     job_id = str(uuid4())[:6]
@@ -69,23 +62,8 @@ def request_summary(user_request : UserRequest, background_tasks : BackgroundTas
     return job_id
 
 
-    # transcriber_response = httpx.post(transcriber_service_url +'/transcribe/', 
-    #                                     headers = {'Content-Type' : 'application/json'}, 
-    #                                     params = {"url" : user_request.url}, 
-    #                                     timeout = None)
-    # transcription_path = transcriber_response.json()['transcription_path']
-    # # # 3. summarize from llm server
-    
-    # summarize_response = httpx.post(summarizer_service_url + '/summarize/', 
-    #                                 headers = {'Content-Type' : 'application/json'}, 
-    #                                 params = {'transcript_path' : str(transcription_path)}, 
-    #                                 timeout = None)
-    
-    # return summarize_response.json()['summary']
-
-
 @app.get('/jobs/{job_id}')
-def summary_result(job_id: str):
+async def summary_result(job_id: str):
     result = {job_id : {'prediction' : ''}}
     summary = store_data_job.get_data_redis(key = job_id)
     result[job_id]['prediction'] = summary
