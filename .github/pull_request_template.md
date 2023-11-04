@@ -15,6 +15,8 @@
 - [ ] Other... Please describe:
 
 ## What?
+### Related Issues
+### TLDR
 ### AS-IS behavior
 <!-- 한 번에 알아보기 쉽도록 설명, 구현, 인풋, 아웃풋, 동작과 같은 항목으로 구분 -->
   
