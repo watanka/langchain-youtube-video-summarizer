@@ -60,6 +60,7 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         with open(transcription_path, 'r') as f :
             transcription = f.read()
         docs = text_split.split_docs(transcription)
+        logger.debug(f'input type for summarizer : [{type(docs)}]')
         # docs = [
         #     Document(
         #         page_content = split,
@@ -68,7 +69,7 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         # ]
         logger.debug('request has been sent to [summarizer].')
         summary_response = mapreduce_chain.invoke(docs, config = {'max_concurrency' : 6})
-        summary_content = summary_response.text
+        summary_content = summary_response
         logger.debug('received response from [summarizer]')
 
         # summary_content = summarize_response.json()['summary']
