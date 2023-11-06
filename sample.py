@@ -11,6 +11,6 @@ if url:
     # video_id = response.json()["video_id"]
 
     
-    st.video(url)
+    st.video(url
     
     # st.error("Invalid YouTube URL")
