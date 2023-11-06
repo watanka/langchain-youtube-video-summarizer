@@ -35,7 +35,7 @@ class InputHandler :
     
     def download(self) :
         if not self.parser :
-            raise 'you have to parse the video first.'
+            raise ValueError # 'you have to parse the video first.'
         if not self.video_stream :
             self.video_stream = self.parse_obj.streams.filter(only_audio = True).first()
         
