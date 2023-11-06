@@ -1,6 +1,6 @@
 from langchain.prompts import PromptTemplate
-from langchain.schema import runnable
-from typing import Dict
+from langchain.schema import runnable, Document
+from typing import Dict, List
 
 from fastapi import FastAPI
 from langserve import add_routes
@@ -15,11 +15,13 @@ def health() -> Dict[str, str]:
     return {"health": "ok"}
 
 
+
+
 add_routes(
     app,
     map_reduce,
-    path = '/summarizer',
-    input_type = runnable.RunnableParallel,
+    path = '/summarize',
+    input_type = List[Document],
     config_keys = {'concurrency'}
 )
 
