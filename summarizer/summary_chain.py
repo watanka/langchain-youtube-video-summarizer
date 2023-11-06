@@ -2,13 +2,13 @@ from functools import partial
 
 from langchain.callbacks.manager import CallbackManagerForChainRun
 from langchain.chains.combine_documents import collapse_docs, split_list_of_docs
-from langchain.chat_models import ChatAnthropic
+from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser, Document
 from langchain.schema.prompt_template import format_document
 from langchain.schema.runnable import RunnableParallel, RunnablePassthrough
 
-llm = ChatAnthropic()
+llm = OpenAI()
 
 # Prompt and method for converting Document -> str.
 document_prompt = PromptTemplate.from_template("{page_content}")
