@@ -1,4 +1,4 @@
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Request
 import httpx
 
 from uuid import uuid4
@@ -22,6 +22,29 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+
+
+@app.middleware('http')
+async def log_requests(request: Request, call_next) :
+    # body = await request.json()
+    # try : 
+        
+    #     logger.info(f'Request Body: {body}')
+    # except json.JSONDecodeError :
+    #     logger.info('Request body cannot be JSON decoded')
+
+    # async def app_iter() :
+    #     yield json.dumps(body).encode()
+
+    # request._receive = app_iter
+
+    logger.info(f'Request: {request.method} {request.url}')
+    response = await call_next(request)
+    logger.info(f'response status: {response.status_code}')
+    return response
+
+
 
 transcriber_service_url = ServiceConfigurations.services.get('transcriber', 'http://transcriber:5000')
 summarizer_service_url = ServiceConfigurations.services.get('summarizer', 'http://summarizer:6000')
