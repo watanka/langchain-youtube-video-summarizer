@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 COPY ./transcriber /${WORKDIR}
 WORKDIR /${WORKDIR}
 
-COPY ./requirements_transcriber.txt /${WORKDIR}/requirements_transcriber.txt
+COPY ./requirements/requirements_transcriber.txt /${WORKDIR}/requirements_transcriber.txt
 COPY ./logging.conf /${WORKDIR}/logging.conf
 
 RUN apt-get -y update && \

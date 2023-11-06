@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 COPY /summarizer /${WORKDIR}
 WORKDIR /${WORKDIR}
 
-COPY ./requirements_summarizer.txt /${WORKDIR}/requirements_summarizer.txt
+COPY ./requirements/requirements_summarizer.txt /${WORKDIR}/requirements_summarizer.txt
 COPY ./logging.conf /${WORKDIR}/logging.conf
 
 RUN apt-get -y update && \
