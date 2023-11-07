@@ -1,6 +1,7 @@
 from langchain.prompts import PromptTemplate
 from langchain.schema import runnable, Document
 from typing import Dict, List
+from log_db import background_jobs
 
 from fastapi import FastAPI
 from langserve import add_routes
