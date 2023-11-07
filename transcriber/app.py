@@ -33,7 +33,7 @@ def health() -> Dict[str, str]:
 
 
 @app.post('/transcribe/')
-def transcribe(url : str, job_id : str, background_tasks : BackgroundTasks) -> Dict[str, str] :
+def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks) -> Dict[str, str] :
 
     # parse input url
     video_info_db = input_handler.parse(url)
@@ -46,9 +46,32 @@ def transcribe(url : str, job_id : str, background_tasks : BackgroundTasks) -> D
     video_info_db.job_id = job_id
     video_info_db.mp3_path = os.path.join(audio_path, f'{video_info_db.video_id}.mp3')
 
-    trscript_path = yt_transcriber(video_path = video_info_db.mp3_path)
+    # pytube 결과 저장
+    background_tasks.add_task(
+        background_jobs.register_pytube_result,
+        **video_info_db
+    )
 
-    # TODO background로 값 db에 집어넣기
+    transcription = yt_transcriber(video_path = video_info_db.mp3_path)
+    
+    # get transcription_filename
+    transcript_filename = os.path.basename(os.path.splitext(video_info_db.mp3_path)[0] + '.txt')
+    trscript_dir = os.getenv("TRANSCRIPTION_PATH", "transcriptions")
+
+    trscript_path = os.path.join(trscript_dir, transcript_filename)
+
+    with open(trscript_path, 'w') as f :
+        f.write(transcription)
+
+    # whisper 결과 저장
+    background_tasks.add_task(
+        background_jobs.register_whisper_result,
+        job_id = job_id,
+        word_count = len(transcription),
+        txt_path = trscript_path        
+    )
+
+
     
 
     return {'transcription_path' : trscript_path}
