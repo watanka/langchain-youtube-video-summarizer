@@ -7,3 +7,4 @@ torch
 python-dotenv
 pytube
 redis
+sqlalchemy
