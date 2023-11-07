@@ -32,7 +32,7 @@ def health() -> Dict[str, str]:
 
 
 @app.post('/transcribe/')
-def transcribe(url : str, background_tasks : BackgroundTasks) -> Dict[str, str] :
+def transcribe(url : str, job_id : str, background_tasks : BackgroundTasks) -> Dict[str, str] :
 
     # parse input url
     video_info_db = input_handler.parse(url)
@@ -41,7 +41,8 @@ def transcribe(url : str, background_tasks : BackgroundTasks) -> Dict[str, str] 
     
     # 동영상 다운로드
     input_handler.download()
-
+    
+    video_info_db.job_id = job_id
     video_info_db.mp3_path = os.path.join(audio_path, f'{video_info_db.video_id}.mp3')
 
     trscript_path = yt_transcriber(video_path = video_info_db.mp3_path)

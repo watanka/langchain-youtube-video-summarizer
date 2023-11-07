@@ -35,7 +35,7 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         logger.debug(f'job id : {job_id}')
         transcriber_response = httpx.post(transcriber_url,
                    headers = {'Content-Type' : 'application/json'},
-                   params = {'url' : url},
+                   params = {'url' : url, 'job_id' : job_id},
                    timeout = None)
         logger.debug('request has been sent to [transcriber].')
         transcription_path = transcriber_response.json()['transcription_path']
