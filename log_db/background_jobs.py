@@ -57,3 +57,8 @@ def register_mapreduce_result(
     with uow :
         uow.mapreduce_repo.add(mapreduce_info)
         uow.commit()
+
+
+def save_txt(path : str, context : str) :
+    with open(path, 'w') as f :
+        f.write(context)
