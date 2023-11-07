@@ -1,6 +1,6 @@
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
-from db_schema import PyTubeInfo
+from log_db.db_schema import PyTubeInfo
 
 from pydantic import BaseModel
 import re
@@ -54,8 +54,8 @@ class InputHandler :
                 'is_valid' : self.is_valid,
                 'video_id' : self.video_id,
                 'video_title' : self.video_title,
-                'video_length' : self.video_length,
                 'file_size' : self.file_size
+                'video_length' : self.video_length,
                 })
     
     def download(self) :

@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db_schema import Base
+from log_db.db_schema import Base
 import os
 from dotenv import load_dotenv, find_dotenv
 # 데이터베이스 엔진 생성 (예: SQLite 메모리 내 DB 사용)

@@ -32,6 +32,12 @@ class WhisperInfo(Base) :
     job_id = Column(String(15), ForeignKey('pytube_info.job_id'))
     word_count = Column(Integer, nullable = True)
     txt_path = Column(String(255), nullable = True)
+    created_datetime = Column(
+        DateTime(timezone=True),
+        server_default=current_timestamp(),
+        nullable=False,
+    )
+
     pytube_info = relationship('PyTubeInfo', back_populates = 'whisper_info', uselist = False)
     # mapreduce_info = relationship('MapReduceInfo', back_populates = 'whisper_info', uselist = False)
 
@@ -43,6 +49,10 @@ class MapReduceInfo(Base) :
     job_id = Column(String(15), ForeignKey('pytube_info.job_id'))
     word_count = Column(Integer, nullable = True)
     summary_path = Column(String(255), nullable = True)
-
+    created_datetime = Column(
+        DateTime(timezone=True),
+        server_default=current_timestamp(),
+        nullable=False,
+    )
     pytube_info = relationship('PyTubeInfo', back_populates = 'mapreduce_info', uselist = False)
     # whisper_info = relationship('WhisperInfo', back_populates = 'mapreduce_info', uselist = False)

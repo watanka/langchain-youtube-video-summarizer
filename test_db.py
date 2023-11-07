@@ -1,6 +1,6 @@
-from db_schema import Base, PyTubeInfo, WhisperInfo, MapReduceInfo
-from repository import PyTubeRepository, WhisperRepository, MapReduceRepository
-from unit_of_work import SqlAlchemyUnitOfWork
+from log_monitoring.db_schema import Base, PyTubeInfo, WhisperInfo, MapReduceInfo
+from log_monitoring.repository import PyTubeRepository, WhisperRepository, MapReduceRepository
+from log_monitoring.unit_of_work import SqlAlchemyUnitOfWork
 
 import pytest
 
@@ -83,3 +83,42 @@ def test_uow_compare_wordcount_of_original_context_and_summary(session_factory) 
         assert query_whisper_info.word_count == 500
         assert query_mapreduce_info.word_count == 200
 
+
+def test_pytube_info_is_not_yet_transcribed_or_summarized(session_factory) :
+    uow = SqlAlchemyUnitOfWork(session_factory = session_factory)
+    
+    test_job_id = 'test-job'
+
+    pytube_info = PyTubeInfo(
+        job_id = test_job_id,
+        is_valid = True,
+        video_id = 'test-video',
+        video_title = 'test-videotitle',
+        file_size = 100,
+        video_length = 30,
+        mp3_path = 'audio/test.mp3',
+    )
+
+    with uow :
+        uow.pytube_repo.add(pytube_info)
+        uow.commit()
+
+    with uow :
+        query_pytube_info = uow.pytube_repo.get(job_id = test_job_id)
+        assert not query_pytube_info.whisper_info
+
+    whisper_info = WhisperInfo(
+        job_id = test_job_id,
+        word_count = 100,
+        txt_path = 'transcriptions/test.txt',
+    )
+
+    with uow :
+        uow.whisper_repo.add(whisper_info)
+        uow.commit()
+
+    with uow :
+        query_pytube_info = uow.pytube_repo.get(job_id = test_job_id)
+
+        assert query_pytube_info.whisper_info
+        assert not query_pytube_info.mapreduce_info
