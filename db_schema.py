@@ -1,43 +1,48 @@
-from sqlalchemy import create_engine, Column, String, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-import os
+from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, DateTime, ForeignKey
+from sqlalchemy.sql.functions import current_timestamp
+from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
 Base = declarative_base()
 
 
-class SaveDataJob(Base) :
-    __tablename__ = 'savedatajobs'
 
-    job_id = Column(String, primary_key=True)
-    src_url = Column(String, nullable=False)
-    is_transcribed = Column(Boolean, default=False)
-    is_summarized = Column(Boolean, default=False)
-    content = Column(String)
+class PyTubeInfo(Base):
+    __tablename__ = 'pytube_info'
+    job_id = Column(String(15), primary_key=True, nullable = False)
 
-engine = create_engine(url = 'mysql+pymysql://{}:{}@{}:{}/{}'.format(
-    os.getenv('DB_USER', 'test-user'),
-    os.getenv('DB_PASSWORD', 'test1234'),
-    os.getenv('DB_HOST', 'db-server'),
-    os.getenv('DB_PORT', '3306'),
-    os.getenv('DB_DATABASE', 'savedatajob'),
-))
-Session = sessionmaker(bind = engine)
-session = Session()
-
-Base.metadata.create_all(engine, check_first = True)
+    is_valid = Column(Boolean, nullable=False)
+    video_id = Column(String(15), nullable=False)  
+    video_title = Column(String(255), nullable=False)  
+    video_length = Column(Integer, nullable=False)
+    file_size = Column(Float, nullable=False)
+    mp3_path = Column(String(255), nullable=True)  # 파일 경로의 길이에 따라 적절하게 조정
+    created_datetime = Column(
+        DateTime(timezone=True),
+        server_default=current_timestamp(),
+        nullable=False,
+    )
+    whisper_info = relationship('WhisperInfo', back_populates='pytube_info', uselist = False)
+    mapreduce_info = relationship('MapReduceInfo', back_populates='pytube_info', uselist = False)
 
 
-class DataJobRepository :
-    
-    def __init__(self, session) :
-        self.session = session
 
-    def get(self, job_id : str) -> SaveDataJob :
-        return self.session.query(SaveDataJob).filter_by(job_id = job_id).first()
+class WhisperInfo(Base) :
+    __tablename__ = 'whisper_info'
+    id = Column(Integer, primary_key=True, autoincrement = True)  # 기본키
+    job_id = Column(String(15), ForeignKey('pytube_info.job_id'))
+    word_count = Column(Integer, nullable = True)
+    txt_path = Column(String(255), nullable = True)
+    pytube_info = relationship('PyTubeInfo', back_populates = 'whisper_info', uselist = False)
+    # mapreduce_info = relationship('MapReduceInfo', back_populates = 'whisper_info', uselist = False)
 
-    def add(self, datajob : SaveDataJob) :
-        self.session.add(datajob)
 
-    def list(self) :
-        return self.session.query(SaveDataJob).all()
+
+class MapReduceInfo(Base) :
+    __tablename__ = 'mapreduce_info'
+    id = Column(Integer, primary_key=True, autoincrement = True)  # 기본키
+    job_id = Column(String(15), ForeignKey('pytube_info.job_id'))
+    word_count = Column(Integer, nullable = True)
+    summary_path = Column(String(255), nullable = True)
+
+    pytube_info = relationship('PyTubeInfo', back_populates = 'mapreduce_info', uselist = False)
+    # whisper_info = relationship('WhisperInfo', back_populates = 'mapreduce_info', uselist = False)

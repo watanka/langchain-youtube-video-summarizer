@@ -5,7 +5,7 @@ class InputHandler :
         self.parser = parser
         self.parse_obj = None
         self.video_stream = None
-
+        # 필요한 정보
         self.video_id = None
         self.video_title = None
         self.file_size = None
@@ -35,7 +35,7 @@ class InputHandler :
     
     def download(self) :
         if not self.parser :
-            raise ValueError # 'you have to parse the video first.'
+            raise 'you have to parse the video first.'
         if not self.video_stream :
             self.video_stream = self.parse_obj.streams.filter(only_audio = True).first()
         
