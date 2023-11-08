@@ -49,7 +49,13 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks) -> Di
     # pytube 결과 저장
     background_tasks.add_task(
         background_jobs.register_pytube_result,
-        **video_info_db
+        job_id = video_info_db.job_id,
+        is_valid = video_info_db.is_valid,
+        video_id = video_info_db.video_id,
+        video_title = video_info_db.video_title,
+        file_size = video_info_db.file_size,
+        video_length = video_info_db.video_length,
+        mp3_path = video_info_db.mp3_path
     )
 
     transcription = yt_transcriber(video_path = video_info_db.mp3_path)
