@@ -45,7 +45,11 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
                    params = {'url' : url, 'job_id' : job_id},
                    timeout = None)
         logger.debug('request has been sent to [transcriber].')
-        transcription_path = transcriber_response.json()['transcription_path']
+        transcription_json = transcriber_response.json()
+        
+        transcription_path = transcription_json['transcription_path']
+        video_id = transcription_json['video_id']
+
         logger.debug('received response from [transcriber].')
         # 중간값 우선 redis에 등록
 
