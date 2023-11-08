@@ -7,3 +7,5 @@ tiktoken
 llama-cpp-python
 langserve[all]
 sqlalchemy
+pymysql
+cryptography

@@ -8,3 +8,5 @@ python-dotenv
 pytube
 redis
 sqlalchemy
+pymysql
+cryptography
