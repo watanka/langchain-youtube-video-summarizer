@@ -54,7 +54,7 @@ class InputHandler :
                 'is_valid' : self.is_valid,
                 'video_id' : self.video_id,
                 'video_title' : self.video_title,
-                'file_size' : self.file_size
+                'file_size' : self.file_size,
                 'video_length' : self.video_length,
                 })
     
