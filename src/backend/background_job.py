@@ -30,8 +30,7 @@ def save_data_job(
         src_url : str,
         job_id: str,
         background_tasks : BackgroundTasks,
-        enqueue : bool = False
-) -> str :
+        enqueue : bool = False) -> str :
     task = SaveDataJob(
         src_url = src_url,
         job_id = job_id,
