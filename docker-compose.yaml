@@ -39,18 +39,24 @@ services :
   transcriber :
     image : "transcriber"
     build : 
-      dockerfile : "./Dockerfile.transcriber"
+      dockerfile : "./Dockerfile.transcriber.${ENVIRONMENT}"
 
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${TRANSCRIBER_PORT}
-    
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - ENVIRONMENT=${ENVIRONMENT}
+
     ports :
       - "5000:5000"
     volumes : 
-      - type : bind
-        source : ./transcriber
-        target : /transcriber
+      # - type : bind
+      #   source : ./transcriber
+      #   target : /transcriber
       - type : bind 
         source : ./run.sh
         target : /transcriber/run.sh
@@ -59,6 +65,7 @@ services :
         target : /transcriber/logging.conf
       - transcription:/transcriber/${TRANSCRIPTION_PATH}
       - audios:/transcriber/${AUDIO_PATH}
+      
 
 
     restart : unless-stopped
@@ -75,11 +82,19 @@ services :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-
+      - SUMMARY_PATH=${SUMMARY_PATH}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - ENVIRONMENT=${ENVIRONMENT}
+    ports :
+      - "6000:6000"
     volumes : 
-      - type : bind
-        source : ./summarizer
-        target : /summarizer
+      # - type : bind
+      #   source : ./summarizer
+      #   target : /summarizer
       - type : bind 
         source : ./run.sh
         target : /summarizer/run.sh
@@ -87,6 +102,7 @@ services :
         source : ./logging.conf
         target : /summarizer/logging.conf
       - transcription:/summarizer/${TRANSCRIPTION_PATH}
+      - summaries:/summarizer/${SUMMARY_PATH}
 
     restart : unless-stopped
     networks : 
@@ -132,3 +148,4 @@ networks :
 volumes :
   audios : 
   transcription :
+  summaries : 
