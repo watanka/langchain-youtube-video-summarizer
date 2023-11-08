@@ -5,11 +5,13 @@ import os
 from time import sleep
 
 from langserve import RemoteRunnable
-from langchain.schema import Document
 import httpx
-from src.backend import text_split
 from src.backend import store_data_job
 from src.backend.configurations import ServiceConfigurations, CacheConfigurations
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 
 
@@ -54,34 +56,41 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         # 중간값 우선 redis에 등록
 
 
-        # summarize_response = httpx.post(summarizer_service_url,
-        #                                 headers = {'Content-Type' : 'application/json'},
-        #                                 params = {'transcript_path' : str(transcription_path)},
-        #                                 timeout = None
-        #                                 )
+        summary_dir = os.getenv('SUMMARY_PATH')
+        summary_path = os.path.join(summary_dir, f'{video_id}_summary.txt')
+
+
+        logger.debug('request has been sent to [summarizer].')
+        summary_response = httpx.post(summarizer_service_url,
+                                        headers = {'Content-Type' : 'application/json'},
+                                        params = {'job_id' : job_id,
+                                                  'transcript_path' : str(transcription_path),
+                                                  'summary_path' : summary_path
+                                                  },
+                                        timeout = None
+                                        )
 
         # read transcription as convert input ready for mapreduce chain.
-        with open(transcription_path, 'r') as f :
-            transcription = f.read()
-        docs = text_split.split_docs(transcription)
-        logger.debug(f'input type for summarizer : [{type(docs)}]')
+        # with open(transcription_path, 'r') as f :
+        #     transcription = f.read()
+        # docs = text_split.split_docs(transcription)
+        # logger.debug(f'input type for summarizer : [{type(docs)}]')
         # docs = [
         #     Document(
         #         page_content = split,
         #         metadata = None, # TODO add info from pytube
         #     ) for split in transcription.split('\n\n')
         # ]
-        logger.debug('request has been sent to [summarizer].')
-        summary_response = mapreduce_chain.invoke(docs, config = {'max_concurrency' : 6})
-        summary_content = summary_response
+        # summary_response = mapreduce_chain.invoke(docs, config = {'max_concurrency' : 6})
+        # summary_content = summary_response
         logger.debug('received response from [summarizer]')
 
         # summary_content = summarize_response.json()['summary']
-        logger.debug(f'summary response : {summary_content}')
-        logger.debug(f'set job_id : {job_id} with summary.\n')
-        # 값 redis에 등록
+        # logger.debug(f'summary response : {summary_content}')
+        # logger.debug(f'set job_id : {job_id} with summary.\n')
+        # # 값 redis에 등록
         # TODO 만약 prediction이 아무런 값도 나오지 않거나, 의미없는 값일 때, 다시 큐에 집어넣음
-        store_data_job.set_data_redis(job_id, summary_content)
+        store_data_job.set_data_redis(job_id, summary_response)
 
         
 
