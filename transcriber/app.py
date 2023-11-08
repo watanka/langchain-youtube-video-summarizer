@@ -77,9 +77,14 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks) -> Di
         txt_path = trscript_path        
     )
 
+    background_tasks.add_task(
+        background_jobs.save_txt,
+        path = trscript_path,
+        context = transcription
+    )
 
-    
-
-    return {'transcription_path' : trscript_path}
+    return {'transcription_path' : trscript_path,
+            'video_id' : video_info_db.video_id
+            }
 
     
