@@ -9,6 +9,10 @@ from langserve import add_routes
 import uvicorn
 import text_split
 from summary_chain import map_reduce
+from logging import getLogger
+
+logger = getLogger(__name__)
+
 
 app = FastAPI()
 
@@ -20,14 +24,15 @@ def health() -> Dict[str, str]:
 
 @app.post('/summarize')
 def summarize(job_id : str, transcript_path : str, summary_path : str, background_task : BackgroundTasks) : 
+    
     runnable = Runnable(map_reduce)
-
+    logger.info('runnable set')
     with open(transcript_path, 'r') as f :
         transcription = f.read()
     docs = text_split.split_docs(transcription)
-
+    logger.info('Load transcription.')
     summary_response = runnable.invoke(docs, config = {'max_concurrency' : 4})
-
+    logger.info(f'runnable done. response is {summary_response}')
     background_task.add_task(
         background_jobs.register_mapreduce_result,
         job_id = job_id,

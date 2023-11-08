@@ -35,13 +35,12 @@ logger.debug(f'summarizer service url : {summarizer_service_url}')
 
 def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url : str) :
     job_id = store_data_job.right_pop_queue(CacheConfigurations.queue_name)
-    # logger.debug(f'job_id : {job_id}')
-    # logger.debug(f'{CacheConfigurations.queue_name} : {store_data_job.list_jobs_in_queue(CacheConfigurations.queue_name)}')
     if job_id is not None : # found job to proces
+
         url = store_data_job.get_data_redis(job_id)
-        # if url != '' :
-        #     return True
         logger.debug(f'job id : {job_id}')
+
+        # call transcriber endpoint
         transcriber_response = httpx.post(transcriber_url,
                    headers = {'Content-Type' : 'application/json'},
                    params = {'url' : url, 'job_id' : job_id},
@@ -56,8 +55,8 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         # 중간값 우선 redis에 등록
 
 
-        summary_dir = os.getenv('SUMMARY_PATH')
-        summary_path = os.path.join(summary_dir, f'{video_id}_summary.txt')
+        summary_dir = str(os.getenv('SUMMARY_PATH', 'summaries'))
+        summary_path = f'{summary_dir}/{video_id}_summary.txt'
 
 
         logger.debug('request has been sent to [summarizer].')
@@ -65,7 +64,7 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
                                         headers = {'Content-Type' : 'application/json'},
                                         params = {'job_id' : job_id,
                                                   'transcript_path' : str(transcription_path),
-                                                  'summary_path' : summary_path
+                                                  'summary_path' : str(summary_path)
                                                   },
                                         timeout = None
                                         )
@@ -84,7 +83,7 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         # summary_response = mapreduce_chain.invoke(docs, config = {'max_concurrency' : 6})
         # summary_content = summary_response
         logger.debug('received response from [summarizer]')
-
+        logger.debug(f'[summarizer response] : {summary_response}')
         # summary_content = summarize_response.json()['summary']
         # logger.debug(f'summary response : {summary_content}')
         # logger.debug(f'set job_id : {job_id} with summary.\n')
