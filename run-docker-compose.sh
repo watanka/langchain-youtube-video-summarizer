@@ -26,4 +26,13 @@ fi
 
 # docker-compose build
 echo "RUNNING docker-compose up"
-ENVIRONMENT="$ENVIRONMENT" docker-compose up --build
+
+if [ "$ENVIRONMENT" = "production" ]; then
+    ENVIRONMENT="$ENVIRONMENT" docker-compose up --build
+
+elif [ "$ENVIRONMENT" = "test" ]; then
+    ENVIRONMENT="$ENVIRONMENT" docker-compose up
+else 
+    echo "Unknown environment: $ENVIRONMENT"
+    exit 1
+fi
