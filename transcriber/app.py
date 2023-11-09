@@ -1,24 +1,32 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
-from transcription import YoutubeTranscriber
+from transcription import YoutubeTranscriber, FakeTranscribeModel
 from log_db import background_jobs
 
 from logging import getLogger
-from transcriber.input_handler import InputHandler
+from input_handler import InputHandler
 from typing import Dict
 from dotenv import load_dotenv
-import whisper
+
 import os
-import torch
 
 logger = getLogger(__name__)
 
-model_name = os.getenv('TRANSCRIBE_MODEL', 'tiny')
-audiofile_path = 'input.mp3'
-logger.debug('loading whisper model')
 
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-model = whisper.load_model('tiny', device = device)
-logger.debug('whisper model ready')
+
+env_setting = os.getenv('ENVIRONMENT')
+logger.info(f'ENVIRONMENT : {env_setting}')
+if env_setting == 'production' :
+    import whisper
+    import torch
+    model_name = os.getenv('TRANSCRIBE_MODEL', 'tiny')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    model = whisper.load_model('tiny', device = device)
+    logger.info('[OPENAI Whisper] model loaded.')
+    
+elif env_setting == 'test' :
+    model = FakeTranscribeModel() 
+    logger.info('[Fake Transcription] model loaded. Results are FAKE!')
+
 
 audio_path = os.getenv("AUDIO_PATH", 'audios')
 
@@ -33,7 +41,7 @@ def health() -> Dict[str, str]:
 
 
 @app.post('/transcribe/')
-def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks) -> Dict[str, str] :
+def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
 
     # parse input url
     video_info_db = input_handler.parse(url)
@@ -65,9 +73,6 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks) -> Di
     trscript_dir = os.getenv("TRANSCRIPTION_PATH", "transcriptions")
 
     trscript_path = os.path.join(trscript_dir, transcript_filename)
-
-    with open(trscript_path, 'w') as f :
-        f.write(transcription)
 
     # whisper 결과 저장
     background_tasks.add_task(

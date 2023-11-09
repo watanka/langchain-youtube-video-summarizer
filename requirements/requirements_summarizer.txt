@@ -3,8 +3,14 @@ gunicorn
 uvicorn[standard]
 langchain
 openai==0.28.1
+openai==0.28.1
 tiktoken
 llama-cpp-python
+langserve[all]
+sqlalchemy
+pymysql
+cryptography
+
 langserve[all]
 sqlalchemy
 pymysql

@@ -14,10 +14,10 @@ services :
       - summarizer
 
     volumes : 
-    #   - type : bind
-    #     source : ./proxy
-    #     target : /proxy
-    #   - type : bind 
+      # - type : bind
+      #   source : ./proxy
+      #   target : /proxy
+      # - type : bind 
     #     source : ./run.sh
     #     target : /proxy/run.sh
       # - type : bind 
@@ -39,7 +39,7 @@ services :
   transcriber :
     image : "transcriber"
     build : 
-      dockerfile : "./Dockerfile.transcriber.${ENVIRONMENT}"
+      dockerfile : "./Dockerfile.transcriber"
 
     environment :
       - APP_NAME=${APP_NAME}
@@ -50,22 +50,24 @@ services :
       - DB_PORT=${DB_PORT}
       - DB_DATABASE=${DB_DATABASE}
       - ENVIRONMENT=${ENVIRONMENT}
-
+    
     ports :
       - "5000:5000"
     volumes : 
-      # - type : bind
-      #   source : ./transcriber
-      #   target : /transcriber
+      - type : bind
+        source : ./transcriber
+        target : /transcriber
       - type : bind 
         source : ./run.sh
         target : /transcriber/run.sh
       - type : bind 
         source : ./logging.conf
         target : /transcriber/logging.conf
+      - type : bind
+        source : ./log_db
+        target : /transcriber/log_db
       - transcription:/transcriber/${TRANSCRIPTION_PATH}
       - audios:/transcriber/${AUDIO_PATH}
-      
 
 
     restart : unless-stopped
@@ -77,32 +79,31 @@ services :
     image : "summarizer"
     build : 
       dockerfile : "./Dockerfile.summarizer"
-
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - SUMMARY_PATH=${SUMMARY_PATH}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_DATABASE=${DB_DATABASE}
-      - ENVIRONMENT=${ENVIRONMENT}
-    ports :
-      - "6000:6000"
+      
+
     volumes : 
-      # - type : bind
-      #   source : ./summarizer
-      #   target : /summarizer
-      - type : bind 
-        source : ./run.sh
-        target : /summarizer/run.sh
+      - type : bind
+        source : ./summarizer
+        target : /summarizer
       - type : bind 
         source : ./logging.conf
         target : /summarizer/logging.conf
+      - type : bind 
+        source : ./run.sh
+        target : /summarizer/run.sh
+      - type : bind
+        source : ./log_db
+        target : /summarizer/log_db
       - transcription:/summarizer/${TRANSCRIPTION_PATH}
-      - summaries:/summarizer/${SUMMARY_PATH}
 
     restart : unless-stopped
     networks : 
@@ -148,4 +149,3 @@ networks :
 volumes :
   audios : 
   transcription :
-  summaries : 
