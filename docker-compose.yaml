@@ -14,10 +14,10 @@ services :
       - summarizer
 
     volumes : 
-    #   - type : bind
-    #     source : ./proxy
-    #     target : /proxy
-    #   - type : bind 
+      # - type : bind
+      #   source : ./proxy
+      #   target : /proxy
+      # - type : bind 
     #     source : ./run.sh
     #     target : /proxy/run.sh
       # - type : bind 
@@ -57,6 +57,9 @@ services :
       - type : bind 
         source : ./logging.conf
         target : /transcriber/logging.conf
+      - type : bind
+        source : ./log_db
+        target : /transcriber/log_db
       - transcription:/transcriber/${TRANSCRIPTION_PATH}
       - audios:/transcriber/${AUDIO_PATH}
 
@@ -70,7 +73,6 @@ services :
     image : "summarizer"
     build : 
       dockerfile : "./Dockerfile.summarizer"
-
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
@@ -81,11 +83,14 @@ services :
         source : ./summarizer
         target : /summarizer
       - type : bind 
-        source : ./run.sh
-        target : /summarizer/run.sh
-      - type : bind 
         source : ./logging.conf
         target : /summarizer/logging.conf
+      - type : bind 
+        source : ./run.sh
+        target : /summarizer/run.sh
+      - type : bind
+        source : ./log_db
+        target : /summarizer/log_db
       - transcription:/summarizer/${TRANSCRIPTION_PATH}
 
     restart : unless-stopped
