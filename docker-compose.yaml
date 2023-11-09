@@ -49,6 +49,7 @@ services :
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_DATABASE=${DB_DATABASE}
+      - ENVIRONMENT=${ENVIRONMENT}
     
     ports :
       - "5000:5000"
