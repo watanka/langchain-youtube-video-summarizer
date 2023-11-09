@@ -44,7 +44,7 @@ class InputHandler :
             if not self.video_stream :
                 self.video_stream = self.parse_obj.streams.filter(only_audio = True).first()
             
-            self.video_id = str(video_id)
+            self.video_id = video_id
             self.video_title = self.parse_obj.title
             self.video_length = self.parse_obj.length
             self.file_size = self.video_stream.filesize / 1024 / 1024

@@ -105,14 +105,29 @@ services :
     entrypoint: ["python", "-m", "src.backend.monitor"]
     depends_on :
       - redis
+    volumes :
+      - transcription:/backend-server/${TRANSCRIPTION_PATH}
     networks :
       - my_network
+    
 
   redis:
     image : 'redis'
     expose :
       - 6379
     networks :
+      - my_network
+
+  logging-db : 
+    image : 'mysql'
+    expose : 
+      - ${DB_PORT}
+    environment:
+      MYSQL_USER: ${DB_USER}  # 데이터베이스 사용자 이름
+      MYSQL_PASSWORD: ${DB_PASSWORD}  # 데이터베이스 사용자의 비밀번호
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}  # 초기에 생성할 데이터베이스 이름
+    networks : 
       - my_network
     
 

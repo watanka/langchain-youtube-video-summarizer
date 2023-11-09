@@ -4,9 +4,14 @@ import asyncio
 import os
 from time import sleep
 
+from langserve import RemoteRunnable
 import httpx
 from src.backend import store_data_job
 from src.backend.configurations import ServiceConfigurations, CacheConfigurations
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 
 
@@ -20,6 +25,10 @@ logger.setLevel(DEBUG)
 
 transcriber_service_url = ServiceConfigurations.services.get('transcriber', 'http://transcriber:5000') + '/transcribe/'
 summarizer_service_url = ServiceConfigurations.services.get('summarizer', 'http://summarizer:6000') + '/summarize/'
+
+mapreduce_chain = RemoteRunnable(summarizer_service_url)
+
+
 logger.debug(f'transcriber service url : {transcriber_service_url}')
 logger.debug(f'summarizer service url : {summarizer_service_url}')
 
@@ -35,26 +44,53 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         logger.debug(f'job id : {job_id}')
         transcriber_response = httpx.post(transcriber_url,
                    headers = {'Content-Type' : 'application/json'},
-                   params = {'url' : url},
+                   params = {'url' : url, 'job_id' : job_id},
                    timeout = None)
         logger.debug('request has been sent to [transcriber].')
-        transcription_path = transcriber_response.json()['transcription_path']
+        transcription_json = transcriber_response.json()
+        
+        transcription_path = transcription_json['transcription_path']
+        video_id = transcription_json['video_id']
+
         logger.debug('received response from [transcriber].')
         # 중간값 우선 redis에 등록
 
 
-        summarize_response = httpx.post(summarizer_service_url,
+        summary_dir = os.getenv('SUMMARY_PATH')
+        summary_path = os.path.join(summary_dir, f'{video_id}_summary.txt')
+
+
+        logger.debug('request has been sent to [summarizer].')
+        summary_response = httpx.post(summarizer_service_url,
                                         headers = {'Content-Type' : 'application/json'},
-                                        params = {'transcript_path' : str(transcription_path)},
+                                        params = {'job_id' : job_id,
+                                                  'transcript_path' : str(transcription_path),
+                                                  'summary_path' : summary_path
+                                                  },
                                         timeout = None
                                         )
-        logger.debug('request has been sent to [summarizer].')
-        summary_content = summarize_response.json()['summary']
+
+        # read transcription as convert input ready for mapreduce chain.
+        # with open(transcription_path, 'r') as f :
+        #     transcription = f.read()
+        # docs = text_split.split_docs(transcription)
+        # logger.debug(f'input type for summarizer : [{type(docs)}]')
+        # docs = [
+        #     Document(
+        #         page_content = split,
+        #         metadata = None, # TODO add info from pytube
+        #     ) for split in transcription.split('\n\n')
+        # ]
+        # summary_response = mapreduce_chain.invoke(docs, config = {'max_concurrency' : 6})
+        # summary_content = summary_response
         logger.debug('received response from [summarizer]')
-        # 값 redis에 등록
+
+        # summary_content = summarize_response.json()['summary']
+        # logger.debug(f'summary response : {summary_content}')
+        # logger.debug(f'set job_id : {job_id} with summary.\n')
+        # # 값 redis에 등록
         # TODO 만약 prediction이 아무런 값도 나오지 않거나, 의미없는 값일 때, 다시 큐에 집어넣음
-        logger.debug(f'set job_id : {job_id} with summary.\n summary : {summary_content}')
-        store_data_job.set_data_redis(job_id, summary_content)
+        store_data_job.set_data_redis(job_id, summary_response)
 
         
 
@@ -69,7 +105,7 @@ def _loop() :
     
 
 
-def monitoring_loop(num_procs : int = 2) :
+def monitoring_loop(num_procs : int = 4) :
     executor = ProcessPoolExecutor(num_procs)
     loop = asyncio.get_event_loop()
 
