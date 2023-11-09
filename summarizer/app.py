@@ -43,17 +43,3 @@ def summarize(job_id : str, transcript_path : str, summary_path : str, backgroun
     )
 
     return summary_response
-
-
-
-add_routes(
-    app,
-    map_reduce,
-    path = '/mapreduce',
-    input_type = List[Document],
-    config_keys = {}
-)
-
-
-if __name__ == '__main__' :
-    uvicorn.run(app, host = '127.0.0.1', port = 6500)
