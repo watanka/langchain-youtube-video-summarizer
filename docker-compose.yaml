@@ -44,6 +44,11 @@ services :
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${TRANSCRIBER_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
     
     ports :
       - "5000:5000"
@@ -77,6 +82,12 @@ services :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      
 
     volumes : 
       - type : bind
