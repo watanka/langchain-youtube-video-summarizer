@@ -1,4 +1,3 @@
-from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from langchain.schema.runnable import Runnable
 from typing import Dict, List
@@ -19,14 +18,14 @@ def health() -> Dict[str, str]:
 
 
 @app.post('/summarize')
-def summarize(job_id : str, transcript_path : str, summary_path : str, background_task : BackgroundTasks) : 
-    runnable = Runnable(map_reduce)
+def summarize(job_id, transcript_path, summary_path, background_task : BackgroundTasks) : 
 
     with open(transcript_path, 'r') as f :
         transcription = f.read()
     docs = text_split.split_docs(transcription)
-
-    summary_response = runnable.invoke(docs, config = {'max_concurrency' : 4})
+    
+    map_reduce.with_config(input_type = List[Document])
+    summary_response = map_reduce.invoke(docs)
 
     background_task.add_task(
         background_jobs.register_mapreduce_result,
