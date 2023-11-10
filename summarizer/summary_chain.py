@@ -74,7 +74,7 @@ reduce_chain = (
     {"context": format_docs}
     | PromptTemplate.from_template("Combine these summaries in korean:\n\n{context}")
     | llm
-    | StrOutputParser()
+    | {'summary' : StrOutputParser()}
 ).with_config(run_name="Reduce")
 
 # The final full chain

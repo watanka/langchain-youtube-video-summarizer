@@ -84,12 +84,14 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         # summary_content = summary_response
         logger.debug('received response from [summarizer]')
         logger.debug(f'[summarizer response] : {summary_response}')
+
+        summary = summary_response.json()['summary']
         # summary_content = summarize_response.json()['summary']
         # logger.debug(f'summary response : {summary_content}')
         # logger.debug(f'set job_id : {job_id} with summary.\n')
         # # 값 redis에 등록
         # TODO 만약 prediction이 아무런 값도 나오지 않거나, 의미없는 값일 때, 다시 큐에 집어넣음
-        store_data_job.set_data_redis(job_id, summary_response)
+        store_data_job.set_data_redis(job_id, summary)
 
         
 
