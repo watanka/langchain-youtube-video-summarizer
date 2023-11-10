@@ -48,12 +48,12 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     if not video_info_db.is_valid : # invalid url
         raise HTTPException(status_code = 400, detail = 'Invalid Video URL.')
     
-    # 동영상 다운로드
-    input_handler.download()
-    
     video_info_db.job_id = job_id
     video_info_db.mp3_path = os.path.join(audio_path, f'{video_info_db.video_id}.mp3')
 
+    # 동영상 다운로드
+    input_handler.download(mp3_path = video_info_db.mp3_path)
+    
     # pytube 결과 저장
     
     logger.debug(f'save pytube info in background. {video_info_db.__dict__}')
@@ -77,6 +77,7 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     trscript_path = os.path.join(trscript_dir, transcript_filename)
 
     # whisper 결과 저장
+    logger.debug(f'save whisper info in background. {trscript_path}')
     background_tasks.add_task(
         background_jobs.register_whisper_result,
         job_id = job_id,
