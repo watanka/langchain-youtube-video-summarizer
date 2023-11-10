@@ -34,7 +34,7 @@ class InputHandler :
             self.is_valid = True
 
         except :
-            print(f'Invalid url {video_url}')
+            logger.debug(f'Invalid url {video_url}')
 
             
         else : 
