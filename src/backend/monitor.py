@@ -58,8 +58,9 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         summary_dir = str(os.getenv('SUMMARY_PATH', 'summaries'))
         summary_path = f'{summary_dir}/{video_id}_summary.txt'
 
-
+        logger.debug(f'summarizer[input]\njob_id : {job_id}\ntranscription_path : {transcription_path}\nsummary_path : {summary_path}\n')
         logger.debug('request has been sent to [summarizer].')
+        
         summary_response = httpx.post(summarizer_service_url,
                                         headers = {'Content-Type' : 'application/json'},
                                         params = {'job_id' : job_id,
