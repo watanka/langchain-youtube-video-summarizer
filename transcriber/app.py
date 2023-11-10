@@ -55,6 +55,8 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     video_info_db.mp3_path = os.path.join(audio_path, f'{video_info_db.video_id}.mp3')
 
     # pytube 결과 저장
+    
+    logger.debug(f'save pytube info in background. {video_info_db.__dict__}')
     background_tasks.add_task(
         background_jobs.register_pytube_result,
         job_id = video_info_db.job_id,
