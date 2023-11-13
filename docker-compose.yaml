@@ -100,8 +100,11 @@ services :
     entrypoint: ["python", "-m", "src.backend.monitor"]
     depends_on :
       - redis
+    volumes :
+      - transcription:/backend-server/${TRANSCRIPTION_PATH}
     networks :
       - my_network
+    
 
   redis:
     image : 'redis'

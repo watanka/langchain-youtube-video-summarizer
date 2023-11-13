@@ -5,3 +5,4 @@ langchain
 openai
 tiktoken
 llama-cpp-python
+langserve[all]
