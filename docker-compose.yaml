@@ -14,10 +14,10 @@ services :
       - summarizer
 
     volumes : 
-    #   - type : bind
-    #     source : ./proxy
-    #     target : /proxy
-    #   - type : bind 
+      # - type : bind
+      #   source : ./proxy
+      #   target : /proxy
+      # - type : bind 
     #     source : ./run.sh
     #     target : /proxy/run.sh
       # - type : bind 
@@ -44,6 +44,12 @@ services :
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${TRANSCRIBER_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - ENVIRONMENT=${ENVIRONMENT}
     
     ports :
       - "5000:5000"
@@ -57,6 +63,9 @@ services :
       - type : bind 
         source : ./logging.conf
         target : /transcriber/logging.conf
+      - type : bind
+        source : ./log_db
+        target : /transcriber/log_db
       - transcription:/transcriber/${TRANSCRIPTION_PATH}
       - audios:/transcriber/${AUDIO_PATH}
 
@@ -70,22 +79,30 @@ services :
     image : "summarizer"
     build : 
       dockerfile : "./Dockerfile.summarizer"
-
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      
 
     volumes : 
       - type : bind
         source : ./summarizer
         target : /summarizer
       - type : bind 
-        source : ./run.sh
-        target : /summarizer/run.sh
-      - type : bind 
         source : ./logging.conf
         target : /summarizer/logging.conf
+      - type : bind 
+        source : ./run.sh
+        target : /summarizer/run.sh
+      - type : bind
+        source : ./log_db
+        target : /summarizer/log_db
       - transcription:/summarizer/${TRANSCRIPTION_PATH}
 
     restart : unless-stopped
@@ -111,6 +128,18 @@ services :
     expose :
       - 6379
     networks :
+      - my_network
+
+  logging-db : 
+    image : 'mysql'
+    expose : 
+      - ${DB_PORT}
+    environment:
+      MYSQL_USER: ${DB_USER}  # 데이터베이스 사용자 이름
+      MYSQL_PASSWORD: ${DB_PASSWORD}  # 데이터베이스 사용자의 비밀번호
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}  # 초기에 생성할 데이터베이스 이름
+    networks : 
       - my_network
     
 

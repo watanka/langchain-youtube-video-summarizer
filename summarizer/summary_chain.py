@@ -7,7 +7,11 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser, Document
 from langchain.schema.prompt_template import format_document
 from langchain.schema.runnable import RunnableParallel, RunnablePassthrough
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
+os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 llm = OpenAI()
 
 # Prompt and method for converting Document -> str.
@@ -70,7 +74,7 @@ reduce_chain = (
     {"context": format_docs}
     | PromptTemplate.from_template("Combine these summaries in korean:\n\n{context}")
     | llm
-    | StrOutputParser()
+    | {'summary' : StrOutputParser()}
 ).with_config(run_name="Reduce")
 
 # The final full chain

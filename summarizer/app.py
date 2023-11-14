@@ -1,13 +1,23 @@
-from langchain.prompts import PromptTemplate
-from langchain.schema import runnable, Document
+from langchain.schema import Document
+from langchain.schema.runnable import Runnable
 from typing import Dict, List
+from log_db import background_jobs
 
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from langserve import add_routes
 import uvicorn
+import text_split
 from summary_chain import map_reduce
+from logging import getLogger
+from pydantic import BaseModel
+
+logger = getLogger(__name__)
+
 
 app = FastAPI()
+
+class SummaryResult(BaseModel) :
+    summary : str
 
 
 @app.get('/health')
@@ -15,27 +25,32 @@ def health() -> Dict[str, str]:
     return {"health": "ok"}
 
 
+@app.post('/summarize/')
+def summarize(job_id : str, transcript_path : str, summary_path : str, background_task : BackgroundTasks) -> SummaryResult: 
+
+    with open(transcript_path, 'r') as f :
+        transcription = f.read()
+
+    docs = text_split.split_docs(transcription)
+    
+    map_reduce.with_config(input_type = List[Document], output = SummaryResult)
+    summary_result = map_reduce.invoke(docs)
 
 
-add_routes(
-    app,
-    map_reduce,
-    path = '/summarize',
-    input_type = List[Document],
-    config_keys = {'concurrency'}
-)
+    logger.debug(f'job id[{job_id}][mapreduce info] : {summary_result}')
+    background_task.add_task(
+        background_jobs.register_mapreduce_result,
+        job_id = job_id,
+        word_count = len(transcription),
+        summary_path = summary_path,
 
-# add_routes(
-#     app,
-#     rag_chain,
-#     path = '/llama-cpp-rag'
-# )
+    )
 
-# document_prompt = PromptTemplate.from_template('{page_content}')
-# map_prompt = '''
-# summarize this content: 
-# {context}
-# '''
+    background_task.add_task(
+        background_jobs.save_txt,
+        path = summary_path,
+        context = summary_result['summary']
+    )
 
-# if __name__ == '__main__' :
-#     uvicorn.run(app, host = '127.0.0.1', port = 6500)
+
+    return summary_result

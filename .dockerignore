@@ -1,0 +1,4 @@
+# Generate .dockerignore file
+# 여기에 테스트 환경에서 무시할 파일이나 디렉토리를 추가
+whisper/
+summarizer/local_llm

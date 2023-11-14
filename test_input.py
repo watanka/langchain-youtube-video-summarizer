@@ -1,6 +1,7 @@
 import pytest
 from pytube import YouTube
-from input_handler import InputHandler
+from transcriber.input_handler import InputHandler
+from pytube.exceptions import VideoUnavailable
 # 영상 제목
 # 영상 id
 # 영상 길이
@@ -17,13 +18,16 @@ def test_video_url() :
 
     video_info = input_handler.parse(video_url = test_url)
 
-    video_id = input_handler.video_id
-    video_title = input_handler.video_title
-    video_length = input_handler.video_length
-    video_file_size = input_handler.file_size
-    print(f'video length : {video_length}s')
-    print(f'videofile size : {video_file_size}')
-    assert video_id == 'C73XAQJFa1E'
-    assert video_title == '[Streamlit] EP03. 데이터프레임(DataFrame), 테이블 출력'
-    assert video_length == 5*60 + 52 # 5분 52초 영상
 
+    assert video_info.video_id == 'C73XAQJFa1E'
+    assert video_info.video_title == '[Streamlit] EP03. 데이터프레임(DataFrame), 테이블 출력'
+    assert video_info.video_length == 5*60 + 52 # 5분 52초 영상
+
+
+def test_invalid_url() :
+    test_url = 'https://www.youtube.com/watch?v=invalid_video_url' # invalid url
+    input_handler = InputHandler()
+
+    video_info = input_handler.parse(video_url = test_url)
+
+    assert not video_info.is_valid 

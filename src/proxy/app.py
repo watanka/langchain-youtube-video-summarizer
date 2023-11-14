@@ -1,4 +1,4 @@
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Request
 import httpx
 
 from uuid import uuid4
@@ -22,6 +22,10 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+
+
+
 
 transcriber_service_url = ServiceConfigurations.services.get('transcriber', 'http://transcriber:5000')
 summarizer_service_url = ServiceConfigurations.services.get('summarizer', 'http://summarizer:6000')
