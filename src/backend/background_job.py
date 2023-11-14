@@ -18,13 +18,9 @@ class SaveDataJob(BaseModel) :
 
 
     def __call__(self) :
-        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
         store_data_job.set_data_redis(self.job_id, self.src_url)
         pushed = store_data_job.left_push_queue(self.queue_name, self.job_id)
-        if pushed :
-            logger.info(f'pushed {self.job_id} into queue.')
-            logger.info(f'{self.queue_name} : {store_data_job.list_jobs_in_queue(self.queue_name)}')
-        
+
 
 def save_data_job(
         src_url : str,
