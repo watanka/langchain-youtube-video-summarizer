@@ -15,10 +15,12 @@ load_dotenv()
 
 
 
-log_format = Formatter("[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d]  %(message)s")
+log_format = Formatter("[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d]  %(message)s",
+                       datefmt='%d/%b/%Y:%H:%M:%S (%Z)'
+                       )
 logger = getLogger('monitor')
 stdout_handler = StreamHandler()
-stdout_handler.setFormatter(log_format, datefmt='%d/%b/%Y:%H:%M:%S (%Z)')
+stdout_handler.setFormatter(log_format)
 logger.addHandler(stdout_handler)
 logger.setLevel(DEBUG)
 
