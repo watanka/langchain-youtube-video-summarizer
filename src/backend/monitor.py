@@ -15,7 +15,7 @@ load_dotenv()
 
 
 
-log_format = Formatter("%(asctime)s %(name)s [%(levelname)s] %(message)s")
+log_format = Formatter("[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d]  %(message)s")
 logger = getLogger('monitor')
 stdout_handler = StreamHandler()
 stdout_handler.setFormatter(log_format)
