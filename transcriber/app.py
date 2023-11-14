@@ -21,11 +21,11 @@ if env_setting == 'production' :
     model_name = os.getenv('TRANSCRIBE_MODEL', 'tiny')
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model = whisper.load_model('tiny', device = device)
-    logger.info('[OPENAI Whisper] model loaded.')
+    logger.debug(f'[OPENAI Whisper] model version [{model_name}] loaded. Using device [{device}].')
     
 elif env_setting == 'test' :
     model = FakeTranscribeModel() 
-    logger.info('[Fake Transcription] model loaded. Results are FAKE!')
+    logger.debug('[Fake Transcription] model loaded. Results are FAKE!')
 
 
 audio_path = os.getenv("AUDIO_PATH", 'audios')
@@ -77,7 +77,6 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     trscript_path = os.path.join(trscript_dir, transcript_filename)
 
     # whisper 결과 저장
-    logger.debug(f'save whisper info in background. {trscript_path}')
     background_tasks.add_task(
         background_jobs.register_whisper_result,
         job_id = job_id,
