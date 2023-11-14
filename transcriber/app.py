@@ -56,7 +56,7 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     
     # pytube 결과 저장
     
-    logger.debug(f'save pytube info in background. {video_info_db.__dict__}')
+    logger.debug(f'job id[{job_id}][pytube info] : {video_info_db.__dict__}')
     background_tasks.add_task(
         background_jobs.register_pytube_result,
         job_id = video_info_db.job_id,
@@ -77,6 +77,7 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     trscript_path = os.path.join(trscript_dir, transcript_filename)
 
     # whisper 결과 저장
+    logger.debug(f'job id[{job_id}][whisper info] : {transcription}')
     background_tasks.add_task(
         background_jobs.register_whisper_result,
         job_id = job_id,

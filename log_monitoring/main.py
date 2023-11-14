@@ -7,11 +7,13 @@ from logging import DEBUG, Formatter, StreamHandler, getLogger
 
 logger = getLogger(__name__)
 logger.setLevel(DEBUG)
-formatter = Formatter("[%(asctime)s] [%(process)d] [%(name)s] [%(levelname)s] %(message)s")
+formatter = Formatter("[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d] %(message)s")
 
 handler = StreamHandler()
 handler.setLevel(DEBUG)
-handler.setFormatter(formatter)
+handler.setFormatter(formatter,
+                     datefmt = '%d/%b/%Y:%H:%M:%S (%Z)'
+                     )
 logger.addHandler(handler)
 
 

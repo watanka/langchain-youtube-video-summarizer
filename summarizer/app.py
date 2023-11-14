@@ -35,7 +35,9 @@ def summarize(job_id : str, transcript_path : str, summary_path : str, backgroun
     
     map_reduce.with_config(input_type = List[Document], output = SummaryResult)
     summary_result = map_reduce.invoke(docs)
-    logger.debug(f'summary response {type(summary_result)} \n {summary_result}')
+
+
+    logger.debug(f'job id[{job_id}][mapreduce info] : {summary_result}')
     background_task.add_task(
         background_jobs.register_mapreduce_result,
         job_id = job_id,

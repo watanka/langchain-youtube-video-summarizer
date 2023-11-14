@@ -18,7 +18,7 @@ load_dotenv()
 log_format = Formatter("[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d]  %(message)s")
 logger = getLogger('monitor')
 stdout_handler = StreamHandler()
-stdout_handler.setFormatter(log_format)
+stdout_handler.setFormatter(log_format, datefmt='%d/%b/%Y:%H:%M:%S (%Z)')
 logger.addHandler(stdout_handler)
 logger.setLevel(DEBUG)
 
@@ -70,7 +70,7 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
                                         )
 
         logger.debug(f'job_id[{job_id}] received response from [summarizer]')
-        logger.debug(f'[summarizer response] : {summary_response}')
+        logger.debug(f'job_id[{job_id}][summarizer response] : {summary_response}')
 
         summary = summary_response.json()['summary']
         store_data_job.set_data_redis(job_id, summary)
