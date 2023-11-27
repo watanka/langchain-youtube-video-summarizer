@@ -4,7 +4,7 @@ services :
   proxy : 
     image : "proxy"
     build : 
-      dockerfile : "./Dockerfile.proxy"
+      dockerfile : "./docker/Dockerfile.proxy"
 
     restart : unless-stopped    
     ports :
@@ -20,9 +20,9 @@ services :
       # - type : bind 
     #     source : ./run.sh
     #     target : /proxy/run.sh
-      # - type : bind 
-      #   source : ./logging.conf
-      #   target : /src/logging.conf
+      - type : bind
+        source : logging.conf
+        target : /proxy-server/logging.conf
       - audios:/proxy/${AUDIO_PATH}
 
     
@@ -39,7 +39,7 @@ services :
   transcriber :
     image : "transcriber"
     build : 
-      dockerfile : "./Dockerfile.transcriber"
+      dockerfile : "./docker/Dockerfile.transcriber.${ENVIRONMENT}"
 
     environment :
       - APP_NAME=${APP_NAME}
@@ -78,7 +78,7 @@ services :
   summarizer : 
     image : "summarizer"
     build : 
-      dockerfile : "./Dockerfile.summarizer"
+      dockerfile : "./docker/Dockerfile.summarizer"
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
@@ -113,12 +113,18 @@ services :
   backend :
     image : 'backend'
     build :
-      dockerfile : './Dockerfile.backend'
+      dockerfile : './docker/Dockerfile.backend'
     entrypoint: ["python", "-m", "src.backend.monitor"]
     depends_on :
       - redis
     volumes :
       - transcription:/backend-server/${TRANSCRIPTION_PATH}
+      - type : bind
+        source : ./src
+        target : /backend-server/src
+      - type : bind
+        source : ./logging.conf
+        target : /backend-server/logging.conf
     networks :
       - my_network
     
