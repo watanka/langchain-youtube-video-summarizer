@@ -28,7 +28,7 @@ fi
 echo "RUNNING docker-compose up"
 
 if [ "$ENVIRONMENT" = "production" ]; then
-    ENVIRONMENT="$ENVIRONMENT" docker-compose up --build
+    ENVIRONMENT="$ENVIRONMENT" docker-compose up #--build
 
 elif [ "$ENVIRONMENT" = "test" ]; then
     ENVIRONMENT="$ENVIRONMENT" docker-compose up
