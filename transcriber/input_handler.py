@@ -5,9 +5,10 @@ from log_db.db_schema import PyTubeInfo
 from pydantic import BaseModel
 import re
 
-from logging import getLogger
-
-logger = getLogger(__name__)
+import logging 
+# from logging.config import fileConfig
+# fileConfig('logging.conf')
+logger = logging.getLogger('endpoint')
 
 class PytubeParseError(Exception) :
     pass 
@@ -63,10 +64,10 @@ class InputHandler :
                 'video_length' : self.video_length,
                 })
     
-    def download(self, mp3_path : str) :
+    def download(self, folder_dir : str, filename : str) :
         if not self.parse_obj :
             raise PytubeParseError('you have to parse the video first.')
         if not self.video_stream :
             self.video_stream = self.parse_obj.streams.filter(only_audio = True).first()
         
-        self.video_stream.download(output_path=mp3_path)
+        self.video_stream.download(output_path=folder_dir, filename = filename)
