@@ -4,6 +4,7 @@ from log_db import background_jobs
 
 import logging
 
+
 from input_handler import InputHandler
 from typing import Dict
 from dotenv import load_dotenv
@@ -52,7 +53,9 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     video_info_db.job_id = job_id
     video_filename = f'{video_info_db.video_id}.mp3'
     # 동영상 다운로드
-    input_handler.download(mp3_path = video_info_db.mp3_path)
+    input_handler.download(folder_dir = audio_path, filename = video_filename)
+    
+    video_info_db.mp3_path = os.path.join(audio_path, video_filename)
     
     # pytube 결과 저장
     
