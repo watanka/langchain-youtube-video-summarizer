@@ -1,4 +1,5 @@
-from logging import DEBUG, Formatter, StreamHandler, getLogger
+import logging
+from logging import Formatter, getLogger, StreamHandler
 from concurrent.futures import ProcessPoolExecutor
 import asyncio
 import os
@@ -22,7 +23,11 @@ logger = getLogger('monitor')
 stdout_handler = StreamHandler()
 stdout_handler.setFormatter(log_format)
 logger.addHandler(stdout_handler)
-logger.setLevel(DEBUG)
+logger.setLevel(logging.DEBUG)
+
+# fileConfig('logging.conf')
+# logger = logging.getLogger('endpoint')
+
 
 
 transcriber_service_url = ServiceConfigurations.services.get('transcriber', 'http://transcriber:5000') + '/transcribe/'
@@ -44,10 +49,14 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         logger.debug(f'pop a job [{job_id}] to process from redis queue')
 
         # call transcriber endpoint
-        transcriber_response = httpx.post(transcriber_url,
-                   headers = {'Content-Type' : 'application/json'},
-                   params = {'url' : url, 'job_id' : job_id},
-                   timeout = None)
+        try :
+            transcriber_response = httpx.post(transcriber_url,
+                    headers = {'Content-Type' : 'application/json'},
+                    params = {'url' : url, 'job_id' : job_id},
+                    timeout = None)
+        except : # 
+            logger.debug(f'error occurs at transcription api.')
+
         logger.debug(f'job_id[{job_id}] has been sent to [transcriber].')
         transcription_json = transcriber_response.json()
         
@@ -62,17 +71,20 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
         
         logger.debug(f'job_id[{job_id}] has been sent to [summarizer].')
         
-        summary_response = httpx.post(summarizer_service_url,
-                                        headers = {'Content-Type' : 'application/json'},
-                                        params = {'job_id' : job_id,
-                                                  'transcript_path' : str(transcription_path),
-                                                  'summary_path' : str(summary_path)
-                                                  },
-                                        timeout = None
-                                        )
+        try :
+            summary_response = httpx.post(summarizer_service_url,
+                                            headers = {'Content-Type' : 'application/json'},
+                                            params = {'job_id' : job_id,
+                                                    'transcript_path' : str(transcription_path),
+                                                    'summary_path' : str(summary_path)
+                                                    },
+                                            timeout = None
+                                            )
+        except :
+            logger.debug(f'error occurs at summary api.')
 
         logger.debug(f'job_id[{job_id}] received response from [summarizer]')
-        logger.debug(f'job_id[{job_id}][summarizer response] : {summary_response}')
+        logger.debug(f'job_id[{job_id}][summarizer response] : {summary_response["summary"]}')
 
         summary = summary_response.json()['summary']
         store_data_job.set_data_redis(job_id, summary)
@@ -100,7 +112,8 @@ def monitoring_loop(num_procs : int = 4) :
     loop.run_forever()
 
 def main() :
-    NUM_PROCS = int(os.getenv('NUM_PROCS', 2))
+    NUM_PROCS = int(os.getenv('NUM_PROCS', 1))
+    logger.debug(f'monitoring runs {NUM_PROCS} processes.')
     monitoring_loop(NUM_PROCS)
 
 if __name__ == '__main__' :

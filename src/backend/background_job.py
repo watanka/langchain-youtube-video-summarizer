@@ -4,7 +4,9 @@ from src.backend.configurations import CacheConfigurations
 from fastapi import BackgroundTasks
 from pydantic import BaseModel
 
-logger = logging.getLogger(__name__)
+
+logger = logging.getLogger('endpoint')
+
 
 
 

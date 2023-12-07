@@ -17,9 +17,13 @@ from typing import Dict, Any
 from src.proxy.schemas import UserRequest
 from src.proxy.configurations import ServiceConfigurations
 
+
 #logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.DEBUG)
+
+# fileConfig('logging.conf')
+# logger = logging.getLogger('endpoint')
+logging.basicConfig(level = logging.DEBUG, format = '[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d] %(message)s')
 
 app = FastAPI()
 
@@ -56,7 +60,7 @@ async def health_all() -> Dict[str, Any] :
 @app.post('/summary')
 def request_summary(user_request : UserRequest, background_tasks : BackgroundTasks) :
     job_id = str(uuid4())[:6]
-
+    logging.debug(f'received request with url : {user_request.url}')
     background_job.save_data_job(src_url=user_request.url,
                                  job_id = job_id,
                                  background_tasks = background_tasks,

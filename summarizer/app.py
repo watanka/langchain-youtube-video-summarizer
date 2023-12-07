@@ -8,11 +8,11 @@ from langserve import add_routes
 import uvicorn
 import text_split
 from summary_chain import map_reduce
-from logging import getLogger
+import logging
 from pydantic import BaseModel
 
-logger = getLogger(__name__)
 
+logging.basicConfig(level = logging.DEBUG, format = '[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d] %(message)s')
 
 app = FastAPI()
 
@@ -37,7 +37,7 @@ def summarize(job_id : str, transcript_path : str, summary_path : str, backgroun
     summary_result = map_reduce.invoke(docs)
 
 
-    logger.debug(f'job id[{job_id}][mapreduce info] : {summary_result}')
+    logging.debug(f'job id[{job_id}][mapreduce info] : {summary_result}')
     background_task.add_task(
         background_jobs.register_mapreduce_result,
         job_id = job_id,

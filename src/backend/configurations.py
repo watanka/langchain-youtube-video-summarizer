@@ -1,10 +1,12 @@
 import os
 from typing import Dict
-from logging import getLogger
+import logging
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
-logger = getLogger(__name__)
+logging.config.fileConfig('logging.conf')
+logger = logging.getLogger('endpoint')
+
 
 
 class ServiceConfigurations :

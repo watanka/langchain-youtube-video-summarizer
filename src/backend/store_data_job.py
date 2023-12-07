@@ -1,9 +1,11 @@
 from logging import getLogger
+# from logging.config import fileConfig
 from src.backend.configurations import RedisCacheConfigurations
 import redis
 from typing import Any
 
-logger = getLogger(__name__)
+# fileConfig('logging.conf')
+# logger = getLogger('endpoint')
 
 redis_client = redis.Redis(
     host = RedisCacheConfigurations.cache_host,

@@ -3,7 +3,9 @@ import requests
 import httpx
 import asyncio
 import os
+import logging
 
+logging.basicConfig(level = logging.DEBUG, format = '[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d] %(message)s')
 proxy_port = os.getenv('PROXY_PORT', '8080')
 
 st.title('Langchain Summarizer:sunglasses:')

@@ -2,30 +2,31 @@ from fastapi import FastAPI, BackgroundTasks, HTTPException
 from transcription import YoutubeTranscriber, FakeTranscribeModel
 from log_db import background_jobs
 
-from logging import getLogger
+import logging
+
 from input_handler import InputHandler
 from typing import Dict
 from dotenv import load_dotenv
 
 import os
 
-logger = getLogger(__name__)
+logging.basicConfig(level = logging.DEBUG, format = '[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d] %(message)s')
 
 
 
 env_setting = os.getenv('ENVIRONMENT')
-logger.info(f'ENVIRONMENT : {env_setting}')
+logging.info(f'ENVIRONMENT : {env_setting}')
 if env_setting == 'production' :
     import whisper
     import torch
     model_name = os.getenv('TRANSCRIBE_MODEL', 'tiny')
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model = whisper.load_model('tiny', device = device)
-    logger.debug(f'[OPENAI Whisper] model version [{model_name}] loaded. Using device [{device}].')
+    logging.debug(f'[OPENAI Whisper] model version [{model_name}] loaded. Using device [{device}].')
     
 elif env_setting == 'test' :
     model = FakeTranscribeModel() 
-    logger.debug('[Fake Transcription] model loaded. Results are FAKE!')
+    logging.debug('[Fake Transcription] model loaded. Results are FAKE!')
 
 
 audio_path = os.getenv("AUDIO_PATH", 'audios')
@@ -49,14 +50,13 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
         raise HTTPException(status_code = 400, detail = 'Invalid Video URL.')
     
     video_info_db.job_id = job_id
-    video_info_db.mp3_path = os.path.join(audio_path, f'{video_info_db.video_id}.mp3')
-
+    video_filename = f'{video_info_db.video_id}.mp3'
     # 동영상 다운로드
     input_handler.download(mp3_path = video_info_db.mp3_path)
     
     # pytube 결과 저장
     
-    logger.debug(f'job id[{job_id}][pytube info] : {video_info_db.__dict__}')
+    logging.debug(f'job id[{job_id}][pytube info] : {video_info_db.__dict__}')
     background_tasks.add_task(
         background_jobs.register_pytube_result,
         job_id = video_info_db.job_id,
@@ -77,7 +77,7 @@ def transcribe(url : str, job_id : str, background_tasks: BackgroundTasks):
     trscript_path = os.path.join(trscript_dir, transcript_filename)
 
     # whisper 결과 저장
-    logger.debug(f'job id[{job_id}][whisper info] : {transcription}')
+    logging.debug(f'job id[{job_id}][whisper info] : {transcription}')
     background_tasks.add_task(
         background_jobs.register_whisper_result,
         job_id = job_id,
