@@ -31,12 +31,12 @@ services :
       - summarizer
 
     volumes : 
-      # - type : bind
-      #   source : ./proxy
-      #   target : /proxy
-      # - type : bind 
-    #     source : ./run.sh
-    #     target : /proxy/run.sh
+      - type : bind
+        source : ./src/
+        target : /proxy-server/src/
+      - type : bind 
+        source : ./run.sh
+        target : /proxy-server/run.sh
       - type : bind
         source : logging.conf
         target : /proxy-server/logging.conf
