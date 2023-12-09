@@ -7,7 +7,6 @@ COPY ./transcriber /${WORKDIR}
 WORKDIR /${WORKDIR}
 
 COPY ./requirements/requirements_transcriber.txt /${WORKDIR}/requirements_transcriber.txt
-COPY ./logging.conf /${WORKDIR}/logging.conf
 
 RUN apt-get -y update && \
     apt-get install git -y && \

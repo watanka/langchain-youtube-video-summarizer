@@ -15,5 +15,5 @@ gunicorn ${APP_NAME} \
     -w ${WORKERS} \
     -k ${UVICORN_WORKER} \
     --log-level ${LOGLEVEL} \
-    --log-config ${LOGCONFIG} \
     --reload
+    # --log-config ${LOGCONFIG} \
