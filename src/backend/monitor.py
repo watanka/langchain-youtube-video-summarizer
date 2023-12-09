@@ -84,9 +84,12 @@ def _trigger_prediction_if_queue(transcriber_url : str, summarizer_service_url :
             logger.debug(f'error occurs at summary api.')
 
         logger.debug(f'job_id[{job_id}] received response from [summarizer]')
-        logger.debug(f'job_id[{job_id}][summarizer response] : {summary_response["summary"]}')
+        logger.debug(f'summary response : {summary_response}')
+
+
 
         summary = summary_response.json()['summary']
+        logger.debug(f'job_id[{job_id}][summarizer response] : {summary}')
         store_data_job.set_data_redis(job_id, summary)
 
         
