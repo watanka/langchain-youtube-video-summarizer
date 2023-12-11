@@ -7,7 +7,7 @@ ENV STREAMLIT_SERVER_ADDRESS 0.0.0.0
 ENV STREAMLIT_SERVER_PORT ${FRONTEND_PORT}
 
 WORKDIR /${WORKDIR}
-COPY ./requirements_frontend.txt /${WORKDIR}/requirements_frontend.txt
+COPY ./requirements/requirements_frontend.txt /${WORKDIR}/requirements_frontend.txt
 
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc && \
