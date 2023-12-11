@@ -7,7 +7,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 WORKDIR /${WORKDIR}
 
 COPY ./requirements/requirements_proxy.txt /${WORKDIR}/requirements_proxy.txt
-COPY ./logging.conf /${WORKDIR}/logging.conf
 
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc && \
