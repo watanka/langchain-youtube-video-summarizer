@@ -4,8 +4,8 @@ import logging
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('endpoint')
+# logging.config.fileConfig('logging.conf')
+# logger = logging.getLogger('endpoint')
 
 
 
@@ -26,5 +26,5 @@ class RedisCacheConfigurations(CacheConfigurations) :
     redis_db = int(os.getenv('REDIS_DB', 0))
     redis_decode_responses = bool(os.getenv('REDIS_DECODE_RESPONSES', True))
 
-logger.info(f'{CacheConfigurations.__name__}: {CacheConfigurations.__dict__}')
-logger.info(f'{RedisCacheConfigurations.__name__}: {RedisCacheConfigurations.__dict__}')
+logging.info(f'{CacheConfigurations.__name__}: {CacheConfigurations.__dict__}')
+logging.info(f'{RedisCacheConfigurations.__name__}: {RedisCacheConfigurations.__dict__}')
