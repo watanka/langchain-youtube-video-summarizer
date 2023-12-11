@@ -5,7 +5,8 @@ services :
   frontend :
     image : 'frontend'
     build :
-      dockerfile : './docker/Dockerfile.frontend'
+      context : './docker'
+      dockerfile : 'Dockerfile.frontend'
     restart : unless-stopped
     ports :
       - "8500:${FRONTEND_PORT}"
@@ -21,7 +22,8 @@ services :
   proxy : 
     image : "proxy"
     build : 
-      dockerfile : "./docker/Dockerfile.proxy"
+      context : './docker'
+      dockerfile : "Dockerfile.proxy"
 
     restart : unless-stopped    
     ports :
@@ -56,7 +58,8 @@ services :
   transcriber :
     image : "transcriber"
     build : 
-      dockerfile : "./docker/Dockerfile.transcriber.${ENVIRONMENT}"
+      context : './docker'
+      dockerfile : "Dockerfile.transcriber.${ENVIRONMENT}"
 
     environment :
       - APP_NAME=${APP_NAME}
@@ -95,7 +98,8 @@ services :
   summarizer : 
     image : "summarizer"
     build : 
-      dockerfile : "./docker/Dockerfile.summarizer"
+      context : './docker'
+      dockerfile : "Dockerfile.summarizer"
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
@@ -130,7 +134,8 @@ services :
   backend :
     image : 'backend'
     build :
-      dockerfile : './docker/Dockerfile.backend'
+      context : './docker'
+      dockerfile : 'Dockerfile.backend'
     entrypoint: ["python", "-m", "src.backend.monitor"]
     depends_on :
       - redis
