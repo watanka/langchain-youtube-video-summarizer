@@ -5,8 +5,8 @@ services :
   frontend :
     image : 'frontend'
     build :
-      context : './docker'
-      dockerfile : 'Dockerfile.frontend'
+      context : '.'
+      dockerfile : './docker/Dockerfile.frontend'
     restart : unless-stopped
     ports :
       - "8500:${FRONTEND_PORT}"
@@ -22,8 +22,8 @@ services :
   proxy : 
     image : "proxy"
     build : 
-      context : './docker'
-      dockerfile : "Dockerfile.proxy"
+      context : '.'
+      dockerfile : "./docker/Dockerfile.proxy"
 
     restart : unless-stopped    
     ports :
@@ -36,13 +36,17 @@ services :
       - type : bind
         source : ./src/
         target : /proxy-server/src/
+      - type : bind
+        source : ./src/log_db/
+        target : /proxy-server/src/log_db/
       - type : bind 
         source : ./run.sh
         target : /proxy-server/run.sh
       - type : bind
         source : logging.conf
         target : /proxy-server/logging.conf
-      - audios:/proxy/${AUDIO_PATH}
+      - audios:/proxy-server/${AUDIO_PATH}
+      - summary:/proxy-server/${SUMMARY_PATH}
 
     
     environment :
@@ -58,8 +62,8 @@ services :
   transcriber :
     image : "transcriber"
     build : 
-      context : './docker'
-      dockerfile : "Dockerfile.transcriber.${ENVIRONMENT}"
+      context : '.'
+      dockerfile : "./docker/Dockerfile.transcriber.${ENVIRONMENT}"
 
     environment :
       - APP_NAME=${APP_NAME}
@@ -84,8 +88,8 @@ services :
         source : ./logging.conf
         target : /transcriber/logging.conf
       - type : bind
-        source : ./log_db
-        target : /transcriber/log_db
+        source : ./src/log_db
+        target : /transcriber/src/log_db
       - transcription:/transcriber/${TRANSCRIPTION_PATH}
       - audios:/transcriber/${AUDIO_PATH}
 
@@ -98,8 +102,8 @@ services :
   summarizer : 
     image : "summarizer"
     build : 
-      context : './docker'
-      dockerfile : "Dockerfile.summarizer"
+      context : '.'
+      dockerfile : "./docker/Dockerfile.summarizer"
     environment :
       - APP_NAME=${APP_NAME}
       - PORT=${SUMMARIZER_PORT}
@@ -125,6 +129,7 @@ services :
         source : ./src/log_db
         target : /summarizer/src/log_db
       - transcription:/summarizer/${TRANSCRIPTION_PATH}
+      - summary:/summarizer/${SUMMARY_PATH}
 
     restart : unless-stopped
     networks : 
@@ -134,8 +139,8 @@ services :
   backend :
     image : 'backend'
     build :
-      context : './docker'
-      dockerfile : 'Dockerfile.backend'
+      context : '.'
+      dockerfile : './docker/Dockerfile.backend'
     entrypoint: ["python", "-m", "src.backend.monitor"]
     depends_on :
       - redis
@@ -177,3 +182,4 @@ networks :
 volumes :
   audios : 
   transcription :
+  summary : 
