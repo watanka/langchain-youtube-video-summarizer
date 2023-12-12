@@ -1,18 +1,18 @@
-from fastapi import FastAPI, BackgroundTasks, Request
+from fastapi import FastAPI, BackgroundTasks, Request, Depends
 import httpx
 
 from uuid import uuid4
 
-import sys, os
 
 
 from src.backend import background_job, store_data_job
+from src.log_db import unit_of_work, db_setup
 
 import logging
 import asyncio
 
-import os
-import json
+from sqlalchemy.orm import Session
+
 from typing import Dict, Any
 from src.proxy.schemas import UserRequest
 from src.proxy.configurations import ServiceConfigurations
@@ -71,12 +71,21 @@ def request_summary(user_request : UserRequest, background_tasks : BackgroundTas
 
 
 @app.get('/jobs/{job_id}')
-async def summary_result(job_id: str):
-    result = {job_id : {'prediction' : ''}}
-    summary = store_data_job.get_data_redis(key = job_id)
-    result[job_id]['prediction'] = summary
+async def summary_result(job_id: str, db : Session = Depends(db_setup.get_db)) -> str:
 
-    return result
+    uow = unit_of_work.SqlAlchemyUnitOfWork(db)
+
+    with uow :
+        mapreduce_info = uow.mapreduce_repo.get(job_id)
+
+    with open(mapreduce_info.summary_path, 'r') as f :
+        summary_str = f.read()
+
+    # result = {job_id : {'prediction' : ''}}
+    # summary = store_data_job.get_data_redis(key = job_id)
+    # result[job_id]['prediction'] = summary
+
+    return summary_str
 
 @app.get('/jobs')
 def list_result() :
