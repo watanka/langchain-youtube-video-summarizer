@@ -10,8 +10,3 @@ langserve[all]
 sqlalchemy
 pymysql
 cryptography
-
-langserve[all]
-sqlalchemy
-pymysql
-cryptography
