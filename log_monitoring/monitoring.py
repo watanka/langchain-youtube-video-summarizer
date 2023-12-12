@@ -1,6 +1,6 @@
-from log_db.unit_of_work import SqlAlchemyUnitOfWork
-from log_db.db_setup import session
-from log_db.db_schema import PyTubeInfo
+from src.log_db.unit_of_work import SqlAlchemyUnitOfWork
+from src.log_db.db_setup import session
+from src.log_db.db_schema import PyTubeInfo
 
 from typing import List
 

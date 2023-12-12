@@ -1,6 +1,6 @@
-from log_db.db_schema import Base, PyTubeInfo, WhisperInfo, MapReduceInfo
-from log_db.repository import PyTubeRepository, WhisperRepository, MapReduceRepository
-from log_db.unit_of_work import SqlAlchemyUnitOfWork
+from src.log_db.db_schema import Base, PyTubeInfo, WhisperInfo, MapReduceInfo
+from src.log_db.repository import PyTubeRepository, WhisperRepository, MapReduceRepository
+from src.log_db.unit_of_work import SqlAlchemyUnitOfWork
 
 import pytest
 

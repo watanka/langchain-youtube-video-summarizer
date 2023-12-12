@@ -1,6 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from transcription import YoutubeTranscriber, FakeTranscribeModel
-from log_db import background_jobs
+from src.log_db import background_jobs
 
 import logging
 

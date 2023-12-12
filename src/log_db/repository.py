@@ -1,4 +1,4 @@
-from log_db.db_schema import PyTubeInfo, WhisperInfo, MapReduceInfo
+from src.log_db.db_schema import PyTubeInfo, WhisperInfo, MapReduceInfo
 from abc import ABC, abstractmethod
 from typing import List, Any
 from sqlalchemy.orm import Session

@@ -18,7 +18,7 @@ RUN apt-get -y update && \
     # pip3 install "git+https://github.com/openai/whisper.git"
 # RUN apt-get install ffmpeg -y 아예 베이스 이미지를 ffmpeg가 포함된 이미지로 교체
 
-COPY /log_db/ /${WORKDIR}/log_db
+COPY ./src/log_db/ /${WORKDIR}/src/log_db
 EXPOSE ${TRANSCRIBER_PORT}
 
 ENV TRANSCRIBE_MODEL tiny

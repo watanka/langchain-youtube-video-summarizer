@@ -19,7 +19,7 @@ RUN apt-get -y update && \
     
     # for local llama-cpp
 
-COPY /log_db/ /${WORKDIR}/log_db
+COPY ./src/log_db/ /${WORKDIR}/src/log_db
 EXPOSE ${SUMMARIZER_PORT}
 
 

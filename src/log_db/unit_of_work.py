@@ -1,5 +1,5 @@
-from log_db.db_schema import PyTubeInfo, WhisperInfo, MapReduceInfo
-from log_db.repository import PyTubeRepository, WhisperRepository, MapReduceRepository
+from src.log_db.db_schema import PyTubeInfo, WhisperInfo, MapReduceInfo
+from src.log_db.repository import PyTubeRepository, WhisperRepository, MapReduceRepository
 from sqlalchemy.orm import Session
 from abc import ABC, abstractmethod
 

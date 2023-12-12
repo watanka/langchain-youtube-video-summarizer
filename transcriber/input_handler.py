@@ -1,6 +1,6 @@
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
-from log_db.db_schema import PyTubeInfo
+from src.log_db.db_schema import PyTubeInfo
 
 from pydantic import BaseModel
 import re
