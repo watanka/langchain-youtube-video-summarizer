@@ -5,7 +5,7 @@ from fastapi import BackgroundTasks
 from pydantic import BaseModel
 
 
-logger = logging.getLogger('endpoint')
+# logger = logging.getLogger('endpoint')
 
 
 
