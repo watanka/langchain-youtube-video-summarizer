@@ -6,7 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 # 데이터베이스 엔진 생성 (예: SQLite 메모리 내 DB 사용)
 load_dotenv(find_dotenv())
 
-DB_USER = os.getenv('DB_USER', 3306)
+DB_USER = os.getenv('DB_USER', 'test_user')
 DB_PASSWORD = os.getenv('DB_PASSWORD', 'test1234')
 DB_HOST = os.getenv('DB_HOST', 'logging-db')
 DB_PORT = os.getenv('DB_PORT', 3306)
