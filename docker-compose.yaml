@@ -18,6 +18,12 @@ services :
       - STREAMLIT_SERVER_PORT=${FRONTEND_PORT}
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
     command : ["streamlit", "run", "app.py"]
+
+    volumes : 
+      - type : bind
+        source : ./frontend
+        target : /frontend-streamlit
+      - summary:/frontend-streamlit/${SUMMARY_PATH}
   
   proxy : 
     image : "proxy"
