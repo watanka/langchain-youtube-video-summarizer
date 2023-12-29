@@ -11,6 +11,8 @@ from summary_chain import map_reduce
 import logging
 from pydantic import BaseModel
 
+import os
+
 
 logging.basicConfig(level = logging.DEBUG, format = '[%(asctime)s] [%(levelname)s] [%(process)d] [%(name)s] [%(funcName)s] [%(lineno)d] %(message)s')
 
@@ -28,6 +30,7 @@ def health() -> Dict[str, str]:
 @app.post('/summarize/')
 def summarize(job_id : str, transcript_path : str, summary_path : str, background_task : BackgroundTasks) -> SummaryResult: 
     logging.debug(f'received job_id[{job_id}].')
+    logging.debug(f'Read transcription from {transcript_path}, current directory is {os.getcwd()}')
     with open(transcript_path, 'r') as f :
         transcription = f.read()
     logging.debug(f'job_id[{job_id}][mapreduce info] : read transcription.')
