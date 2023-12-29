@@ -6,7 +6,7 @@ from uuid import uuid4
 
 
 from src.backend import background_job, store_data_job
-from src.log_db import unit_of_work, db_setup
+from src.log_db import db_setup, repository
 
 import logging
 import asyncio
@@ -73,12 +73,13 @@ def request_summary(user_request : UserRequest, background_tasks : BackgroundTas
 @app.get('/jobs/{job_id}')
 async def summary_result(job_id: str, db : Session = Depends(db_setup.get_db)) -> str:
 
-    uow = unit_of_work.SqlAlchemyUnitOfWork(db)
+    mapreduce_repo = repository.MapReduceRepository(db)
+    db_summary_result = mapreduce_repo.get(job_id)
+    logging.debug(f'query from DB : job_id : [{job_id}] : {db_summary_result}')
+    # if not db_summary_result :
+    #     return 'Still Processing'
 
-    with uow :
-        mapreduce_info = uow.mapreduce_repo.get(job_id)
-
-    with open(mapreduce_info.summary_path, 'r') as f :
+    with open(db_summary_result.summary_path, 'r') as f :
         summary_str = f.read()
 
     # result = {job_id : {'prediction' : ''}}
@@ -86,6 +87,17 @@ async def summary_result(job_id: str, db : Session = Depends(db_setup.get_db)) -
     # result[job_id]['prediction'] = summary
 
     return summary_str
+
+
+@app.get('/allsummaries')
+def all_summary_results(db : Session = Depends(db_setup.get_db)) :
+    
+    mapreduce_repo = repository.MapReduceRepository(db)
+    return mapreduce_repo.list()
+
+
+
+
 
 @app.get('/jobs')
 def list_result() :
